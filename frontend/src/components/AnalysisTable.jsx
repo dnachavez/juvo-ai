@@ -1,11 +1,95 @@
 import React, { useState } from "react";
-import { AlertTriangle, Eye, Clock, Flag, User, MapPin, Hash, ExternalLink, Info, X, Check } from "lucide-react";
+import { AlertTriangle, Eye, Clock, Flag, User, MapPin, Hash, ExternalLink, Info, X, Check, FileText, Upload } from "lucide-react";
 
 export default function AnalysisTable({ analysisData = [] }) {
   const [sortField, setSortField] = useState("post.scraped_at");
   const [sortDirection, setSortDirection] = useState("desc");
   const [selectedItem, setSelectedItem] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [caseStatuses, setCaseStatuses] = useState(() => {
+    return JSON.parse(localStorage.getItem('caseStatuses') || '{}');
+  });
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [statusChangeItem, setStatusChangeItem] = useState(null);
+  const [newStatus, setNewStatus] = useState("");
+  const [reportText, setReportText] = useState("");
+  const [reportFile, setReportFile] = useState(null);
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "investigation":
+        return "bg-yellow-600/20 text-yellow-400 border-yellow-600/30";
+      case "intervention":
+        return "bg-orange-600/20 text-orange-400 border-orange-600/30";
+      case "resolution":
+        return "bg-green-600/20 text-green-400 border-green-600/30";
+      default:
+        return "bg-gray-600/20 text-gray-400 border-gray-600/30";
+    }
+  };
+
+  const handleStatusChange = (item, status) => {
+    setStatusChangeItem(item);
+    setNewStatus(status);
+    setShowStatusModal(true);
+    setReportText("");
+    setReportFile(null);
+  };
+
+  const saveStatusChange = async () => {
+    if (!reportText.trim() && !reportFile) {
+      alert("Please provide a report (text or file) when changing status.");
+      return;
+    }
+
+    try {
+      // Create report data
+      const reportData = {
+        analysisId: statusChangeItem.analysis_id,
+        previousStatus: caseStatuses[statusChangeItem.analysis_id] || "new",
+        newStatus: newStatus,
+        reportText: reportText,
+        timestamp: new Date().toISOString(),
+        fileName: reportFile?.name || null
+      };
+
+      // Save to local storage (in real app, this would be sent to backend)
+      const existingReports = JSON.parse(localStorage.getItem('caseReports') || '{}');
+      if (!existingReports[statusChangeItem.analysis_id]) {
+        existingReports[statusChangeItem.analysis_id] = [];
+      }
+      existingReports[statusChangeItem.analysis_id].push(reportData);
+      localStorage.setItem('caseReports', JSON.stringify(existingReports));
+
+      // Update status
+      setCaseStatuses(prev => {
+        const updated = {
+          ...prev,
+          [statusChangeItem.analysis_id]: newStatus
+        };
+        // Also save to localStorage for persistence
+        localStorage.setItem('caseStatuses', JSON.stringify(updated));
+        return updated;
+      });
+
+      // Reset modal state
+      setShowStatusModal(false);
+      setStatusChangeItem(null);
+      setNewStatus("");
+      setReportText("");
+      setReportFile(null);
+
+      alert("Status updated and report saved successfully!");
+    } catch (error) {
+      console.error("Error saving status change:", error);
+      alert("Error saving status change. Please try again.");
+    }
+  };
+
+  const getCaseReports = (analysisId) => {
+    const reports = JSON.parse(localStorage.getItem('caseReports') || '{}');
+    return reports[analysisId] || [];
+  };
 
   const getRiskLevelColor = (level) => {
     switch (level) {
@@ -247,7 +331,7 @@ export default function AnalysisTable({ analysisData = [] }) {
   return (
     <div className="bg-slate-800/50 rounded-lg border border-slate-700 p-6">
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[2000px]">
+        <table className="w-full min-w-[2200px]">
           <thead>
             <tr className="border-b border-slate-600">
               {/* Analysis ID */}
@@ -345,6 +429,10 @@ export default function AnalysisTable({ analysisData = [] }) {
               
               {/* AI Version */}
               <th className="text-left py-3 px-2 text-slate-300 font-medium min-w-[150px]">Gemini Model</th>
+              
+              {/* Status and Actions */}
+              <th className="text-left py-3 px-2 text-slate-300 font-medium min-w-[120px]">Status</th>
+              <th className="text-left py-3 px-2 text-slate-300 font-medium min-w-[100px]">Reports</th>
               
               {/* Processing and Signature */}
               <th className="text-left py-3 px-2 text-slate-300 font-medium min-w-[80px]">Processing (ms)</th>
@@ -522,6 +610,42 @@ export default function AnalysisTable({ analysisData = [] }) {
                   {item.ai_version?.gemini_model || ""}
                 </td>
                 
+                {/* Status and Actions */}
+                <td className="py-2 px-2">
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={caseStatuses[item.analysis_id] || "new"}
+                      onChange={(e) => handleStatusChange(item, e.target.value)}
+                      className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(caseStatuses[item.analysis_id])} bg-transparent`}
+                    >
+                      <option value="new">New</option>
+                      <option value="investigation">Investigation</option>
+                      <option value="intervention">Intervention</option>
+                      <option value="resolution">Resolution</option>
+                    </select>
+                  </div>
+                </td>
+                <td className="py-2 px-2">
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs text-slate-400">
+                      {getCaseReports(item.analysis_id).length}
+                    </span>
+                    <button
+                      onClick={() => {
+                        const reports = getCaseReports(item.analysis_id);
+                        if (reports.length > 0) {
+                          alert(`Reports for ${item.analysis_id}:\n\n${reports.map((r, i) => `${i + 1}. ${r.timestamp}: ${r.previousStatus} → ${r.newStatus}\n${r.reportText}`).join('\n\n')}`);
+                        } else {
+                          alert("No reports available for this case.");
+                        }
+                      }}
+                      className="text-blue-400 hover:text-blue-300"
+                    >
+                      <FileText className="w-3 h-3" />
+                    </button>
+                  </div>
+                </td>
+                
                 {/* Processing and Signature */}
                 <td className="py-2 px-2 text-slate-300 text-xs">
                   {item.processing_ms || ""}
@@ -542,7 +666,7 @@ export default function AnalysisTable({ analysisData = [] }) {
         )}
       </div>
       
-      {/* Modal */}
+      {/* Detail Modal */}
       {showModal && (
         <DetailModal 
           item={selectedItem} 
@@ -551,6 +675,88 @@ export default function AnalysisTable({ analysisData = [] }) {
             setSelectedItem(null);
           }} 
         />
+      )}
+
+      {/* Status Change Modal */}
+      {showStatusModal && statusChangeItem && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-900 rounded-lg border border-slate-700 max-w-2xl w-full max-h-[90vh] overflow-auto">
+            <div className="flex justify-between items-center p-6 border-b border-slate-700">
+              <h2 className="text-xl font-bold text-slate-100">Change Case Status</h2>
+              <button
+                onClick={() => setShowStatusModal(false)}
+                className="text-slate-400 hover:text-slate-100 transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="p-6 space-y-6">
+              <div>
+                <h3 className="text-lg font-semibold text-slate-200 mb-2">Case Information</h3>
+                <div className="bg-slate-800 rounded-lg p-4 space-y-2">
+                  <div><span className="font-medium text-slate-300">Analysis ID:</span> <span className="text-slate-100">{statusChangeItem.analysis_id}</span></div>
+                  <div><span className="font-medium text-slate-300">Current Status:</span> <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(caseStatuses[statusChangeItem.analysis_id])}`}>{caseStatuses[statusChangeItem.analysis_id] || "New"}</span></div>
+                  <div><span className="font-medium text-slate-300">New Status:</span> <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(newStatus)}`}>{newStatus}</span></div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-slate-200 mb-2">Required Report</h3>
+                <p className="text-slate-400 text-sm mb-4">Please provide a report explaining the status change and any actions taken.</p>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-slate-300 text-sm font-medium mb-2">Report Text</label>
+                    <textarea
+                      value={reportText}
+                      onChange={(e) => setReportText(e.target.value)}
+                      className="w-full bg-slate-800 border border-slate-600 rounded-lg p-3 text-slate-100 placeholder:text-slate-400 h-32"
+                      placeholder="Describe the actions taken, findings, or reasons for status change..."
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-slate-300 text-sm font-medium mb-2">Upload Report File (Optional)</label>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="file"
+                        onChange={(e) => setReportFile(e.target.files[0])}
+                        className="hidden"
+                        id="report-file-upload"
+                        accept=".pdf,.doc,.docx,.txt"
+                      />
+                      <label
+                        htmlFor="report-file-upload"
+                        className="flex items-center gap-2 bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 text-slate-300 hover:bg-slate-700 cursor-pointer"
+                      >
+                        <Upload className="w-4 h-4" />
+                        Choose File
+                      </label>
+                      {reportFile && (
+                        <span className="text-slate-300 text-sm">{reportFile.name}</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-700">
+                <button
+                  onClick={() => setShowStatusModal(false)}
+                  className="px-4 py-2 text-slate-300 hover:text-slate-100 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={saveStatusChange}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                >
+                  Save Status Change
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

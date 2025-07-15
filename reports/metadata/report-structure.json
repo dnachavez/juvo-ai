@@ -1,0 +1,37 @@
+{
+  "description": "Case Report Management System",
+  "version": "1.0.0",
+  "storage": {
+    "type": "localStorage",
+    "keys": {
+      "caseReports": "Object containing report arrays keyed by analysis_id",
+      "caseStatuses": "Object containing current status for each analysis_id"
+    }
+  },
+  "report_structure": {
+    "analysisId": "string - The unique analysis ID from the case",
+    "previousStatus": "string - Previous status before change (new|investigation|intervention|resolution)",
+    "newStatus": "string - New status after change (new|investigation|intervention|resolution)",
+    "reportText": "string - Text description of actions taken or findings",
+    "timestamp": "ISO string - When the report was created",
+    "fileName": "string|null - Name of uploaded file if any"
+  },
+  "status_options": [
+    "new",
+    "investigation", 
+    "intervention",
+    "resolution"
+  ],
+  "workflow": {
+    "1": "Case starts with 'new' status",
+    "2": "When status is changed, user must provide a report",
+    "3": "Report can include text description and/or file upload",
+    "4": "All reports are stored and can be viewed per case",
+    "5": "Status changes are tracked with timestamps"
+  },
+  "file_storage": {
+    "location": "/reports/case-reports/",
+    "supported_formats": [".pdf", ".doc", ".docx", ".txt"],
+    "note": "Files are referenced by name in localStorage, actual storage implementation depends on backend"
+  }
+}

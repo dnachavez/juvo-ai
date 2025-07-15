@@ -40,6 +40,8 @@ export default function AnalysisSection({ analysisData = [] }) {
       "Explanation",
       "Recommended Action",
       "Priority Score",
+      "Status",
+      "Number of Reports",
       "RA11930 Compliant",
       "Privacy Exemption",
       "Gemini Model",
@@ -62,6 +64,10 @@ export default function AnalysisSection({ analysisData = [] }) {
       if (!arr || !Array.isArray(arr)) return "";
       return arr.join("; ");
     };
+
+    // Get case statuses and reports from localStorage
+    const caseStatuses = JSON.parse(localStorage.getItem('caseStatuses') || '{}');
+    const caseReports = JSON.parse(localStorage.getItem('caseReports') || '{}');
 
     // Convert data to CSV rows
     const csvRows = filteredData.map(item => [
@@ -90,6 +96,8 @@ export default function AnalysisSection({ analysisData = [] }) {
       escapeCSV(item.explanation),
       escapeCSV(item.recommended_action),
       escapeCSV(item.priority_score ? `${item.priority_score}%` : ''),
+      escapeCSV(caseStatuses[item.analysis_id] || "New"),
+      escapeCSV((caseReports[item.analysis_id] || []).length),
       escapeCSV(item.compliance?.ra11930 === true ? "Yes" : item.compliance?.ra11930 === false ? "No" : ""),
       escapeCSV(item.compliance?.data_privacy_exemption === true ? "Yes" : item.compliance?.data_privacy_exemption === false ? "No" : ""),
       escapeCSV(item.ai_version?.gemini_model),
