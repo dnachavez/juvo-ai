@@ -235,6 +235,7 @@ const AnalysisSection = React.memo(function AnalysisSection({ analysisData: prop
   const paginatedData = filteredData.slice(startIndex, endIndex);
 
   const riskCounts = {
+    critical: analysisData.filter(item => item.risk_level === "critical").length,
     high: analysisData.filter(item => item.risk_level === "high").length,
     medium: analysisData.filter(item => item.risk_level === "medium").length,
     low: analysisData.filter(item => item.risk_level === "low").length,
@@ -256,13 +257,17 @@ const AnalysisSection = React.memo(function AnalysisSection({ analysisData: prop
       </div>
 
       {/* Summary Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
         <div className="bg-slate-800/50 rounded-lg border border-slate-700 p-4 text-center">
           <div className="text-2xl font-bold text-slate-100">{analysisData.length}</div>
           <div className="text-slate-400 text-sm">Total Analyses</div>
         </div>
         <div className="bg-slate-800/50 rounded-lg border border-slate-700 p-4 text-center">
-          <div className="text-2xl font-bold text-red-400">{riskCounts.high}</div>
+          <div className="text-2xl font-bold text-red-500">{riskCounts.critical}</div>
+          <div className="text-slate-400 text-sm">Critical Risk</div>
+        </div>
+        <div className="bg-slate-800/50 rounded-lg border border-slate-700 p-4 text-center">
+          <div className="text-2xl font-bold text-orange-500">{riskCounts.high}</div>
           <div className="text-slate-400 text-sm">High Risk</div>
         </div>
         <div className="bg-slate-800/50 rounded-lg border border-slate-700 p-4 text-center">
@@ -270,8 +275,8 @@ const AnalysisSection = React.memo(function AnalysisSection({ analysisData: prop
           <div className="text-slate-400 text-sm">Medium Risk</div>
         </div>
         <div className="bg-slate-800/50 rounded-lg border border-slate-700 p-4 text-center">
-          <div className="text-2xl font-bold text-orange-400">{riskCounts.flagged}</div>
-          <div className="text-slate-400 text-sm">Flagged</div>
+          <div className="text-2xl font-bold text-green-400">{riskCounts.low}</div>
+          <div className="text-slate-400 text-sm">Low Risk</div>
         </div>
       </div>
 
@@ -297,6 +302,7 @@ const AnalysisSection = React.memo(function AnalysisSection({ analysisData: prop
               onChange={(e) => setRiskFilter(e.target.value)}
             >
               <option value="all">All Risk Levels</option>
+              <option value="critical">Critical Risk</option>
               <option value="high">High Risk</option>
               <option value="medium">Medium Risk</option>
               <option value="low">Low Risk</option>
@@ -436,15 +442,15 @@ const AnalysisSection = React.memo(function AnalysisSection({ analysisData: prop
         </div>
       )}
 
-      {/* Alert for high-risk items */}
-      {filteredData.some(item => item.risk_level === "high" && item.flagged) && (
+      {/* Alert for critical and high-risk items */}
+      {filteredData.some(item => (item.risk_level === "critical" || item.risk_level === "high") && item.flagged) && (
         <div className="bg-red-600/10 border border-red-600/30 rounded-lg p-4 mb-6">
           <div className="flex items-center gap-3">
             <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0" />
             <div>
-              <div className="text-red-400 font-medium">High-Risk Content Detected</div>
+              <div className="text-red-400 font-medium">Critical/High-Risk Content Detected</div>
               <div className="text-red-300 text-sm">
-                {filteredData.filter(item => item.risk_level === "high" && item.flagged).length} items require immediate attention
+                {filteredData.filter(item => (item.risk_level === "critical" || item.risk_level === "high") && item.flagged).length} items require immediate attention
               </div>
             </div>
           </div>

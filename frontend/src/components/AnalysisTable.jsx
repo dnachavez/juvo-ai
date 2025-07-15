@@ -121,8 +121,10 @@ const AnalysisTable = React.memo(function AnalysisTable({ analysisData = [] }) {
 
   const getRiskLevelColor = (level) => {
     switch (level) {
+      case "critical":
+        return "bg-red-500/20 text-red-500 border-red-500/30";
       case "high":
-        return "bg-red-600/20 text-red-400 border-red-600/30";
+        return "bg-orange-500/20 text-orange-500 border-orange-500/30";
       case "medium":
         return "bg-yellow-600/20 text-yellow-400 border-yellow-600/30";
       case "low":
@@ -280,18 +282,30 @@ const AnalysisTable = React.memo(function AnalysisTable({ analysisData = [] }) {
     };
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-slate-900 rounded-lg border border-slate-700 max-w-4xl max-h-[90vh] overflow-auto w-full">
-          <div className="flex justify-between items-center p-6 border-b border-slate-700">
+      <div 
+        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" 
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            onClose();
+          }
+        }}
+      >
+        <div className="bg-slate-900 rounded-lg border border-slate-700 max-w-4xl w-full h-[90vh] flex flex-col">
+          <div className="flex justify-between items-center p-6 border-b border-slate-700 flex-shrink-0">
             <h2 className="text-xl font-bold text-slate-100">Analysis Record Details</h2>
             <button
-              onClick={onClose}
-              className="text-slate-400 hover:text-slate-100 transition-colors"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onClose();
+              }}
+              className="text-slate-400 hover:text-slate-100 transition-colors p-1 hover:bg-slate-800 rounded"
             >
               <X className="w-6 h-6" />
             </button>
           </div>
-          <div className="p-6 space-y-6">
+          <div className="overflow-y-auto flex-1">
+            <div className="p-6 space-y-6">
             {/* Analysis ID */}
             <div>
               <h3 className="text-lg font-semibold text-slate-200 mb-2">Analysis Information</h3>
@@ -371,6 +385,7 @@ const AnalysisTable = React.memo(function AnalysisTable({ analysisData = [] }) {
                 <div><span className="font-medium text-slate-300">Privacy Exemption:</span> <span className="text-slate-100">{item.compliance?.data_privacy_exemption === true ? '✓ Yes' : item.compliance?.data_privacy_exemption === false ? '✗ No' : 'N/A'}</span></div>
                 <div className="md:col-span-2"><span className="font-medium text-slate-300">Signature:</span> <span className="text-slate-100 break-all">{formatValue(item.signature)}</span></div>
               </div>
+            </div>
             </div>
           </div>
         </div>
@@ -491,7 +506,10 @@ const AnalysisTable = React.memo(function AnalysisTable({ analysisData = [] }) {
           </thead>
           <tbody>
             {sortedData.map((item) => (
-              <tr key={item.analysis_id} className="border-b border-slate-700/50 hover:bg-slate-700/30">
+              <tr key={item.analysis_id} className="border-b border-slate-700/50 hover:bg-slate-700/30 cursor-pointer" onClick={() => {
+                setSelectedItem(item);
+                setShowModal(true);
+              }}>
                 {/* Analysis ID */}
                 <td className="py-2 px-2 text-slate-300 text-xs">
                   <TruncatedCell fullText={item.analysis_id} item={item}>
@@ -666,6 +684,7 @@ const AnalysisTable = React.memo(function AnalysisTable({ analysisData = [] }) {
                     <select
                       value={caseStatuses[item.analysis_id] || "new"}
                       onChange={(e) => handleStatusChange(item, e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
                       className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(caseStatuses[item.analysis_id])} bg-transparent`}
                     >
                       <option value="new">New</option>
@@ -681,7 +700,8 @@ const AnalysisTable = React.memo(function AnalysisTable({ analysisData = [] }) {
                       {getCaseReports(item.analysis_id).length}
                     </span>
                     <button
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation();
                         const reports = getCaseReports(item.analysis_id);
                         if (reports.length > 0) {
                           setViewingReports(reports);

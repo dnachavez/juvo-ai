@@ -5,8 +5,8 @@ import { useHeatmapData } from '../hooks/useHeatmapData';
 import 'leaflet/dist/leaflet.css';
 
 const riskColor = {
-  critical: '#dc2626', // red-600
-  high: '#dc2626',     // red-600  
+  critical: '#ef4444', // red-500 - more intense red
+  high: '#f97316',     // orange-500 - distinct orange
   medium: '#eab308',   // yellow-500
   low: '#22c55e',      // green-500
 };
@@ -120,7 +120,7 @@ const HeatmapMap = React.memo(function HeatmapMap() {
         </div>
       )}
 
-      <div className="flex gap-4 items-center text-sm">
+      <div className="flex gap-4 items-center text-sm text-slate-300">
         <span className="flex items-center gap-1">
           <span className="w-4 h-4 rounded mr-1 inline-block" style={{ backgroundColor: riskColor.critical }}></span>
           Critical Risk

@@ -71,7 +71,11 @@ const HeatmapSection = React.memo(function HeatmapSection({ riskPoints, riskColo
             </div>
             <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-8 items-center flex-shrink-0">
               <span className="flex items-center gap-2 sm:gap-3">
-                <span className="w-3 sm:w-4 h-3 sm:h-4 bg-red-600 rounded-full"></span>
+                <span className="w-3 sm:w-4 h-3 sm:h-4 bg-red-500 rounded-full"></span>
+                <span className="text-slate-300 font-medium text-sm sm:text-base">Critical Risk</span>
+              </span>
+              <span className="flex items-center gap-2 sm:gap-3">
+                <span className="w-3 sm:w-4 h-3 sm:h-4 bg-orange-500 rounded-full"></span>
                 <span className="text-slate-300 font-medium text-sm sm:text-base">High Risk</span>
               </span>
               <span className="flex items-center gap-2 sm:gap-3">
@@ -89,9 +93,15 @@ const HeatmapSection = React.memo(function HeatmapSection({ riskPoints, riskColo
           <div className="bg-slate-900 rounded-lg border border-slate-700 p-4 sm:p-6 h-full flex flex-col">
             <div className="mb-6 flex-shrink-0">
               <h3 className="text-lg font-semibold text-slate-100 mb-3 text-center">Risk Summary</h3>
-              <div className="grid grid-cols-3 gap-3 mb-4">
+              <div className="grid grid-cols-2 gap-3 mb-4">
                 <div className="text-center p-2 bg-slate-800 rounded border border-slate-600">
-                  <div className="text-lg font-bold text-red-400">
+                  <div className="text-lg font-bold text-red-500">
+                    {loading ? "..." : (riskPoints ? riskPoints.filter(p => p.risk === 'critical').length : 0)}
+                  </div>
+                  <div className="text-xs text-slate-400">Critical Risk</div>
+                </div>
+                <div className="text-center p-2 bg-slate-800 rounded border border-slate-600">
+                  <div className="text-lg font-bold text-orange-500">
                     {loading ? "..." : (riskPoints ? riskPoints.filter(p => p.risk === 'high').length : 0)}
                   </div>
                   <div className="text-xs text-slate-400">High Risk</div>
@@ -129,7 +139,7 @@ const HeatmapSection = React.memo(function HeatmapSection({ riskPoints, riskColo
                 ) : (
                   riskPoints
                     .sort((a, b) => {
-                      const riskOrder = { high: 3, medium: 2, low: 1 };
+                      const riskOrder = { critical: 4, high: 3, medium: 2, low: 1 };
                       return riskOrder[b.risk] - riskOrder[a.risk] || b.count - a.count;
                     })
                     .map((point, idx) => (
@@ -139,8 +149,10 @@ const HeatmapSection = React.memo(function HeatmapSection({ riskPoints, riskColo
                         <div className="mb-2">
                           <span
                             className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${
-                              point.risk === "high"
-                                ? "bg-red-600/20 text-red-400 border border-red-600/30"
+                              point.risk === "critical"
+                                ? "bg-red-500/20 text-red-500 border border-red-500/30"
+                                : point.risk === "high"
+                                ? "bg-orange-500/20 text-orange-500 border border-orange-500/30"
                                 : point.risk === "medium"
                                 ? "bg-yellow-600/20 text-yellow-400 border border-yellow-600/30"
                                 : "bg-green-600/20 text-green-400 border border-green-600/30"

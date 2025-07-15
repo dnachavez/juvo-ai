@@ -47,9 +47,10 @@ export default function App() {
 
   // Risk color mapping
   const riskColor = {
-    high: "red",
-    medium: "yellow",
-    low: "green",
+    critical: '#ef4444', // red-500 - most intense red
+    high: '#f97316',     // orange-500 - distinct orange
+    medium: '#eab308',   // yellow-500
+    low: '#22c55e',      // green-500
   };
 
 
