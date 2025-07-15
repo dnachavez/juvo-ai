@@ -1,0 +1,13 @@
+[
+  {"category": "OSAEC Cases", "count": 42, "desc": "Online Sexual Abuse and Exploitation of Children"},
+  {"category": "Child Trafficking Cebu City", "count": 18, "desc": "Trafficking cases involving minors in Cebu City"},
+  {"category": "Family-Based Exploitation Stats", "count": 27, "desc": "Cases involving family-based exploitation"},
+  {"category": "CSAEM Production Cases", "count": 9, "desc": "Child Sexual Abuse and Exploitation Material"},
+  {"category": "Live-Streaming Abuse", "count": 13, "desc": "Live-streamed child abuse incidents"},
+  {"category": "Sextortion & Grooming", "count": 21, "desc": "Sextortion and online grooming cases"},
+  {"category": "Illegal Adoption (Central Visayas)", "count": 7, "desc": "Illegal adoption cases in Central Visayas"},
+  {"category": "Child Sale/Trafficking Investigations", "count": 6, "desc": "Investigations into child sale/trafficking"},
+  {"category": "Viral Abuse Content", "count": 11, "desc": "Abuse content that went viral online"},
+  {"category": "Misinformation & False Reports", "count": 5, "desc": "Cases of misinformation or false reporting"},
+  {"category": "Cyberbullying (Minors Cebu)", "count": 15, "desc": "Cyberbullying cases involving minors in Cebu"}
+]

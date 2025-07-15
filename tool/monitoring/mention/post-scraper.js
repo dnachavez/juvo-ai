@@ -9,7 +9,7 @@ export class PostScraper {
     this.browser = null;
     this.context = null;
     this.page = null;
-    this.mediaFolder = path.join(process.cwd(), '..', '..', '..', 'scraped_media');
+    this.mediaFolder = path.join(process.cwd(), 'scraped_media');
     this.ensureMediaFolderExists();
   }
 
@@ -564,15 +564,28 @@ export class PostScraper {
     try {
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
       const filename = `post_${postData.postId || timestamp}.json`;
-      const filepath = path.join(process.cwd(), '..', '..', '..', 'scraped_posts', filename);
+      const filepath = path.join(process.cwd(), 'scraped_posts', filename);
       
       fs.writeFileSync(filepath, JSON.stringify(postData, null, 2));
       console.log(`Saved post data to: ${filepath}`);
+      
+      // Run analysis on the saved post
+      await this.runAnalysis(filepath);
       
       return filepath;
     } catch (error) {
       console.error('Error saving post data:', error.message);
       throw error;
+    }
+  }
+
+  async runAnalysis(filePath) {
+    try {
+      // Dynamic import to avoid dependency issues if analysis tool is not available
+      const { IntegratedAnalyzer } = await import('../../analysis/integrated-analyzer.js');
+      await IntegratedAnalyzer.analyzeIfConfigured(filePath);
+    } catch (error) {
+      console.log('Analysis skipped:', error.message);
     }
   }
 }

@@ -1,0 +1,290 @@
+[
+  {
+    "analysis_id": "87c51e32-fe3a-4706-b2aa-83d1b1016fcb",
+    "source": {
+      "platform": "facebook",
+      "collection_method": "browser_use",
+      "scrape_session_id": "sess-2025-07-13T06:00Z"
+    },
+    "post": {
+      "id": "10299234567890123",
+      "permalink": "https://www.facebook.com/…",
+      "scraped_at": "2025-07-13T06:05:11Z",
+      "published_at": "2025-07-13T05:58:47Z",
+      "full_text": "Pm me, young girls welcome…",
+      "media": [
+        {
+          "url": "https://fbcdn.net/…/abcd.jpg",
+          "type": "image",
+          "hash_sha256": "e3b0c44298fc1c149afbf4c8996fb924…"
+        }
+      ]
+    },
+    "actors": {
+      "poster": {
+        "name": "Juan Dela Cruz",
+        "profile_id": "100011112222333",
+        "profile_url": "https://www.facebook.com/profile.php?id=…"
+      },
+      "sharers": [],
+      "mentioned_people": ["Mary Ann"]
+    },
+    "language_detected": "en",
+    "location_detected": null,
+    "keywords_matched": ["young girls", "pm me"],
+    "risk_scores": {
+      "grooming": 0.76,
+      "trafficking": 0.64,
+      "csam": 0.12,
+      "harassment": 0.05
+    },
+    "risk_level": "high",
+    "flagged": true,
+    "flag_reason": ["GROOMING_PATTERN"],
+    "explanation": "Text invites underage girls to direct chat, matching grooming indicators.",
+    "model_outputs": {
+      "gemini": {},
+      "photodna": { "match": false }
+    },
+    "matched_hashes": [],
+    "recommended_action": "alert_immediate",
+    "priority_score": 92,
+    "compliance": {
+      "ra11930": true,
+      "data_privacy_exemption": true
+    },
+    "ai_version": {
+      "gemini_model": "gemini-1.5-pro-202507"
+    },
+    "processing_ms": 378,
+    "signature": "c1b2e4…"
+  },
+  {
+    "analysis_id": "45b8c21a-dc5f-4829-a1bb-92f3e5647abc",
+    "source": {
+      "platform": "facebook",
+      "collection_method": "browser_use",
+      "scrape_session_id": "sess-2025-07-13T06:00Z"
+    },
+    "post": {
+      "id": "10299234567890124",
+      "permalink": "https://www.facebook.com/post2",
+      "scraped_at": "2025-07-13T06:10:22Z",
+      "published_at": "2025-07-13T06:05:15Z",
+      "full_text": "Looking for teenage models for photo shoot. Cash payment available. Contact me privately.",
+      "media": []
+    },
+    "actors": {
+      "poster": {
+        "name": "Mike Photography",
+        "profile_id": "100055556666777",
+        "profile_url": "https://www.facebook.com/profile.php?id=100055556666777"
+      },
+      "sharers": [],
+      "mentioned_people": []
+    },
+    "language_detected": "en",
+    "location_detected": "Manila, Philippines",
+    "keywords_matched": ["teenage", "models", "cash payment", "privately"],
+    "risk_scores": {
+      "grooming": 0.82,
+      "trafficking": 0.75,
+      "csam": 0.45,
+      "harassment": 0.15
+    },
+    "risk_level": "high",
+    "flagged": true,
+    "flag_reason": ["RECRUITMENT_PATTERN", "FINANCIAL_INCENTIVE"],
+    "explanation": "Post targeting minors with financial incentives and privacy requests shows trafficking indicators.",
+    "model_outputs": {
+      "gemini": {},
+      "photodna": { "match": false }
+    },
+    "matched_hashes": [],
+    "recommended_action": "alert_immediate",
+    "priority_score": 89,
+    "compliance": {
+      "ra11930": true,
+      "data_privacy_exemption": true
+    },
+    "ai_version": {
+      "gemini_model": "gemini-1.5-pro-202507"
+    },
+    "processing_ms": 425,
+    "signature": "d2c3f5…"
+  },
+  {
+    "analysis_id": "23f9a87c-bb4e-4512-9c33-78d4e2138def",
+    "source": {
+      "platform": "instagram",
+      "collection_method": "api",
+      "scrape_session_id": "sess-2025-07-13T07:00Z"
+    },
+    "post": {
+      "id": "18123456789012345",
+      "permalink": "https://www.instagram.com/p/abc123",
+      "scraped_at": "2025-07-13T07:15:33Z",
+      "published_at": "2025-07-13T07:12:10Z",
+      "full_text": "Anyone know girls aged 12-16 interested in modeling? Good money involved. DM for details.",
+      "media": [
+        {
+          "url": "https://instagram.com/…/image.jpg",
+          "type": "image",
+          "hash_sha256": "f4c5d66399ec2c290bfa4c9007fb925a…"
+        }
+      ]
+    },
+    "actors": {
+      "poster": {
+        "name": "talent_scout_ph",
+        "profile_id": "987654321098765",
+        "profile_url": "https://www.instagram.com/talent_scout_ph"
+      },
+      "sharers": [],
+      "mentioned_people": []
+    },
+    "language_detected": "en",
+    "location_detected": "Cebu City, Philippines",
+    "keywords_matched": ["girls aged 12-16", "modeling", "good money", "DM"],
+    "risk_scores": {
+      "grooming": 0.91,
+      "trafficking": 0.88,
+      "csam": 0.72,
+      "harassment": 0.25
+    },
+    "risk_level": "high",
+    "flagged": true,
+    "flag_reason": ["EXPLICIT_AGE_TARGETING", "RECRUITMENT_PATTERN", "FINANCIAL_INCENTIVE"],
+    "explanation": "Explicitly targets minors with specific age range, financial incentives, and private communication requests.",
+    "model_outputs": {
+      "gemini": {},
+      "photodna": { "match": false }
+    },
+    "matched_hashes": [],
+    "recommended_action": "alert_immediate",
+    "priority_score": 98,
+    "compliance": {
+      "ra11930": true,
+      "data_privacy_exemption": true
+    },
+    "ai_version": {
+      "gemini_model": "gemini-1.5-pro-202507"
+    },
+    "processing_ms": 502,
+    "signature": "e3d4f6…"
+  },
+  {
+    "analysis_id": "67d3b45e-aa8f-4921-b566-45c8f9234ghi",
+    "source": {
+      "platform": "facebook",
+      "collection_method": "browser_use",
+      "scrape_session_id": "sess-2025-07-13T08:00Z"
+    },
+    "post": {
+      "id": "10299234567890125",
+      "permalink": "https://www.facebook.com/post3",
+      "scraped_at": "2025-07-13T08:22:45Z",
+      "published_at": "2025-07-13T08:18:30Z",
+      "full_text": "Selling handmade crafts for charity fundraiser. All proceeds go to local orphanage.",
+      "media": [
+        {
+          "url": "https://fbcdn.net/…/craft.jpg",
+          "type": "image",
+          "hash_sha256": "a1b2c3d4e5f6789012345678901234…"
+        }
+      ]
+    },
+    "actors": {
+      "poster": {
+        "name": "Maria Santos",
+        "profile_id": "100077778888999",
+        "profile_url": "https://www.facebook.com/profile.php?id=100077778888999"
+      },
+      "sharers": [],
+      "mentioned_people": []
+    },
+    "language_detected": "en",
+    "location_detected": "Davao City, Philippines",
+    "keywords_matched": ["charity", "orphanage"],
+    "risk_scores": {
+      "grooming": 0.15,
+      "trafficking": 0.08,
+      "csam": 0.02,
+      "harassment": 0.01
+    },
+    "risk_level": "low",
+    "flagged": false,
+    "flag_reason": [],
+    "explanation": "Post appears to be legitimate charity fundraising activity with no concerning indicators.",
+    "model_outputs": {
+      "gemini": {},
+      "photodna": { "match": false }
+    },
+    "matched_hashes": [],
+    "recommended_action": "monitor",
+    "priority_score": 12,
+    "compliance": {
+      "ra11930": true,
+      "data_privacy_exemption": true
+    },
+    "ai_version": {
+      "gemini_model": "gemini-1.5-pro-202507"
+    },
+    "processing_ms": 298,
+    "signature": "f5g6h7…"
+  },
+  {
+    "analysis_id": "89e5c67d-ff1a-4834-c788-56d9f3456jkl",
+    "source": {
+      "platform": "facebook",
+      "collection_method": "browser_use",
+      "scrape_session_id": "sess-2025-07-13T09:00Z"
+    },
+    "post": {
+      "id": "10299234567890126",
+      "permalink": "https://www.facebook.com/post4",
+      "scraped_at": "2025-07-13T09:35:12Z",
+      "published_at": "2025-07-13T09:30:55Z",
+      "full_text": "Free tutoring sessions for high school students. Math and science subjects. Group classes only.",
+      "media": []
+    },
+    "actors": {
+      "poster": {
+        "name": "Teacher Anne",
+        "profile_id": "100099990000111",
+        "profile_url": "https://www.facebook.com/profile.php?id=100099990000111"
+      },
+      "sharers": [],
+      "mentioned_people": []
+    },
+    "language_detected": "en",
+    "location_detected": "Quezon City, Philippines",
+    "keywords_matched": ["high school students", "tutoring"],
+    "risk_scores": {
+      "grooming": 0.35,
+      "trafficking": 0.12,
+      "csam": 0.08,
+      "harassment": 0.05
+    },
+    "risk_level": "medium",
+    "flagged": false,
+    "flag_reason": [],
+    "explanation": "Educational offer targeting minors but appears legitimate with group setting mentioned.",
+    "model_outputs": {
+      "gemini": {},
+      "photodna": { "match": false }
+    },
+    "matched_hashes": [],
+    "recommended_action": "review",
+    "priority_score": 45,
+    "compliance": {
+      "ra11930": true,
+      "data_privacy_exemption": true
+    },
+    "ai_version": {
+      "gemini_model": "gemini-1.5-pro-202507"
+    },
+    "processing_ms": 367,
+    "signature": "g7h8i9…"
+  }
+]

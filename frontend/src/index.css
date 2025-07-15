@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 6rem; /* Account for header height */
+}
+
+body {
+  @apply bg-slate-900 text-slate-100 font-sans;
+}
+
+/* Enhanced smooth scrolling for reduced motion users */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

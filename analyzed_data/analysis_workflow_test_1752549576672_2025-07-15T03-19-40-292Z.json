@@ -1,0 +1,105 @@
+{
+  "analysis_id": "3cb1e147-9f28-49db-825a-dbfa00f83c04",
+  "source": {
+    "platform": "facebook",
+    "collection_method": "browser_use",
+    "scrape_session_id": "sess-2025-07-15T03:00Z"
+  },
+  "post": {
+    "id": "workflow_test_1752549576672",
+    "permalink": "https://www.facebook.com/test/posts/workflow",
+    "scraped_at": "2025-07-15T03:19:36.672Z",
+    "published_at": "2025-07-15T01:19:36.673Z",
+    "full_text": "Hey young ladies 14-17, I can make you famous! Send me your photos and I'll make you a model. Private chat only, don't tell parents.",
+    "media": []
+  },
+  "actors": {
+    "poster": {
+      "name": "Suspicious User",
+      "profile_id": "200000000000000",
+      "profile_url": "https://www.facebook.com/profile.php?id=200000000000000"
+    },
+    "sharers": [],
+    "mentioned_people": []
+  },
+  "language_detected": "en",
+  "location_detected": null,
+  "keywords_matched": [
+    "young ladies",
+    "14-17",
+    "famous",
+    "photos",
+    "model",
+    "private chat",
+    "don't tell parents"
+  ],
+  "risk_scores": {
+    "grooming": 0.9,
+    "trafficking": 0.6,
+    "csam": 0.4,
+    "harassment": 0.1
+  },
+  "risk_level": "high",
+  "flagged": true,
+  "flag_reason": [
+    "Age range specified (14-17)",
+    "Promise of fame/modeling opportunity",
+    "Request for photos",
+    "Emphasis on private communication",
+    "Instruction to avoid parental notification"
+  ],
+  "explanation": "The post targets a vulnerable age group (14-17) with promises of fame and modeling, while encouraging private communication and discouraging parental involvement. This exhibits strong grooming indicators. There is also a moderate risk of potential trafficking given the exploitation of youth for fame or profit.",
+  "model_outputs": {
+    "gemini": {
+      "language_detected": "en",
+      "mentioned_people": [],
+      "location_detected": null,
+      "keywords_matched": [
+        "young ladies",
+        "14-17",
+        "famous",
+        "photos",
+        "model",
+        "private chat",
+        "don't tell parents"
+      ],
+      "risk_scores": {
+        "grooming": 0.9,
+        "trafficking": 0.6,
+        "csam": 0.4,
+        "harassment": 0.1
+      },
+      "risk_level": "high",
+      "flagged": true,
+      "flag_reason": [
+        "Age range specified (14-17)",
+        "Promise of fame/modeling opportunity",
+        "Request for photos",
+        "Emphasis on private communication",
+        "Instruction to avoid parental notification"
+      ],
+      "explanation": "The post targets a vulnerable age group (14-17) with promises of fame and modeling, while encouraging private communication and discouraging parental involvement. This exhibits strong grooming indicators. There is also a moderate risk of potential trafficking given the exploitation of youth for fame or profit.",
+      "recommended_action": "alert_immediate",
+      "priority_score": 90,
+      "compliance": {
+        "ra11930": true,
+        "data_privacy_exemption": false
+      }
+    },
+    "photodna": {
+      "match": false
+    }
+  },
+  "matched_hashes": [],
+  "recommended_action": "alert_immediate",
+  "priority_score": 90,
+  "compliance": {
+    "ra11930": true,
+    "data_privacy_exemption": true
+  },
+  "ai_version": {
+    "gemini_model": "gemini-2.0-flash-exp"
+  },
+  "processing_ms": 3605,
+  "signature": "3bea17bf"
+}

@@ -1,0 +1,17 @@
+{
+  "name": "facebook-search-tool",
+  "version": "1.0.0",
+  "description": "Facebook search tool for monitoring specific keywords",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "playwright": "^1.40.0",
+    "yaml": "^2.3.4",
+    "fs": "^0.0.1-security",
+    "path": "^0.12.7"
+  },
+  "type": "module"
+}
