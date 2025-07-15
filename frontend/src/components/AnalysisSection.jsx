@@ -343,7 +343,7 @@ const AnalysisSection = React.memo(function AnalysisSection({ analysisData: prop
             <button 
               onClick={handleRefresh}
               disabled={loading || isRefreshing}
-              className="flex items-center gap-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm transition-colors"
+              className="hidden flex items-center gap-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm transition-colors"
             >
               <RefreshCw className={`w-4 h-4 ${(loading || isRefreshing) ? 'animate-spin' : ''}`} />
               {(loading || isRefreshing) ? 'Refreshing...' : 'Refresh'}
