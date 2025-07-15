@@ -153,7 +153,7 @@ app.post('/api/notify', (req, res) => {
   sseClients.forEach(client => {
     try {
       client.write(`data: ${JSON.stringify(notification)}\n\n`);
-    } catch (error) {
+    } catch {
       // Remove dead clients
       sseClients = sseClients.filter(c => c !== client);
     }

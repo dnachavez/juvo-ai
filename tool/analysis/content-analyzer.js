@@ -145,22 +145,22 @@ Focus on detecting patterns like:
       },
       post: {
         id: scrapedData.postId || "unknown",
-        permalink: scrapedData.permalink,
-        scraped_at: scrapedData.scrapedAt,
-        published_at: scrapedData.publishedAt,
+        permalink: scrapedData.permalink || `https://www.facebook.com/${scrapedData.postId}`,
+        scraped_at: scrapedData.scrapedAt || new Date().toISOString(),
+        published_at: scrapedData.publishedAt || scrapedData.scrapedAt || new Date().toISOString(),
         full_text: scrapedData.fullText || "",
         media: this.formatMediaData(scrapedData.mediaUrls || [])
       },
       actors: {
         poster: {
           name: scrapedData.posterName || "Unknown",
-          profile_id: scrapedData.posterProfileId || "",
-          profile_url: scrapedData.posterProfileUrl || ""
+          profile_id: scrapedData.posterProfileId || scrapedData.posterId || "",
+          profile_url: scrapedData.posterProfileUrl || (scrapedData.posterProfileId ? `https://www.facebook.com/profile.php?id=${scrapedData.posterProfileId}` : "")
         },
         sharers: scrapedData.sharerName ? [{
           name: scrapedData.sharerName,
-          profile_id: scrapedData.sharerProfileId || "",
-          profile_url: scrapedData.sharerProfileUrl || ""
+          profile_id: scrapedData.sharerProfileId || scrapedData.sharerId || "",
+          profile_url: scrapedData.sharerProfileUrl || (scrapedData.sharerProfileId ? `https://www.facebook.com/profile.php?id=${scrapedData.sharerProfileId}` : "")
         }] : [],
         mentioned_people: geminiAnalysis.mentioned_people || []
       },
@@ -168,14 +168,14 @@ Focus on detecting patterns like:
       location_detected: geminiAnalysis.location_detected || null,
       keywords_matched: geminiAnalysis.keywords_matched || [],
       risk_scores: {
-        grooming: geminiAnalysis.risk_scores?.grooming || 0.0,
-        trafficking: geminiAnalysis.risk_scores?.trafficking || 0.0,
-        csam: geminiAnalysis.risk_scores?.csam || 0.0,
-        harassment: geminiAnalysis.risk_scores?.harassment || 0.0
+        grooming: Number((geminiAnalysis.risk_scores?.grooming || 0.0).toFixed(2)),
+        trafficking: Number((geminiAnalysis.risk_scores?.trafficking || 0.0).toFixed(2)),
+        csam: Number((geminiAnalysis.risk_scores?.csam || 0.0).toFixed(2)),
+        harassment: Number((geminiAnalysis.risk_scores?.harassment || 0.0).toFixed(2))
       },
       risk_level: geminiAnalysis.risk_level || "low",
       flagged: geminiAnalysis.flagged || false,
-      flag_reason: geminiAnalysis.flag_reason || [],
+      flag_reason: Array.isArray(geminiAnalysis.flag_reason) ? geminiAnalysis.flag_reason : [],
       explanation: geminiAnalysis.explanation || "Automated analysis completed",
       model_outputs: {
         gemini: geminiAnalysis,
@@ -185,8 +185,8 @@ Focus on detecting patterns like:
       recommended_action: geminiAnalysis.recommended_action || "no_action",
       priority_score: geminiAnalysis.priority_score || 0,
       compliance: {
-        ra11930: geminiAnalysis.compliance?.ra11930 || true,
-        data_privacy_exemption: geminiAnalysis.compliance?.data_privacy_exemption || true
+        ra11930: geminiAnalysis.compliance?.ra11930 !== false,
+        data_privacy_exemption: geminiAnalysis.compliance?.data_privacy_exemption !== false
       },
       ai_version: {
         gemini_model: "gemini-2.0-flash-exp"
@@ -259,7 +259,7 @@ Focus on detecting patterns like:
 
   /**
    * Determines if analysis should be saved based on harmful content criteria
-   * Only saves content flagged for serious crimes like trafficking, grooming, CSAM, etc.
+   * Only saves content flagged for child trafficking, online sexual exploitation, and similar harmful activities
    */
   shouldSaveAnalysis(analysisResult) {
     // Must be flagged as concerning content
@@ -267,51 +267,59 @@ Focus on detecting patterns like:
       return false;
     }
 
-    // Must have medium, high, or critical risk level
+    // Must have high or critical risk level for serious crimes
     const riskLevel = analysisResult.risk_level?.toLowerCase();
-    if (!['medium', 'high', 'critical'].includes(riskLevel)) {
+    if (!['high', 'critical'].includes(riskLevel)) {
       return false;
     }
 
-    // Check for specific harmful content indicators
+    // Check for specific harmful content indicators with stricter thresholds
     const riskScores = analysisResult.risk_scores || {};
-    const harmfulThreshold = 0.3; // Lower threshold for serious crimes
+    const seriousHarmThreshold = 0.5; // Higher threshold for serious crimes only
 
-    const hasTraffickingRisk = riskScores.trafficking >= harmfulThreshold;
-    const hasGroomingRisk = riskScores.grooming >= harmfulThreshold;
-    const hasCSAMRisk = riskScores.csam >= harmfulThreshold;
+    const hasTraffickingRisk = riskScores.trafficking >= seriousHarmThreshold;
+    const hasGroomingRisk = riskScores.grooming >= seriousHarmThreshold;
+    const hasCSAMRisk = riskScores.csam >= seriousHarmThreshold;
     
-    // Check for harmful keywords in flag reasons
+    // Check for specific serious crime keywords in flag reasons
     const flagReasons = (analysisResult.flag_reason || []).join(' ').toLowerCase();
-    const harmfulKeywords = [
-      'trafficking', 'exploitation', 'grooming', 'csam', 'child abuse',
-      'sexual exploitation', 'human trafficking', 'forced labor',
-      'commercial sexual exploitation', 'online predator', 'child predator',
-      'solicitation', 'inappropriate contact with minor'
+    const seriousCrimeKeywords = [
+      'child trafficking', 'human trafficking', 'sexual exploitation', 'grooming',
+      'csam', 'child abuse', 'online sexual exploitation', 'child sexual abuse',
+      'commercial sexual exploitation', 'child predator', 'online predator',
+      'solicitation', 'child solicitation', 'minor exploitation'
     ];
     
-    const hasHarmfulKeywords = harmfulKeywords.some(keyword => 
+    const hasSeriousCrimeKeywords = seriousCrimeKeywords.some(keyword => 
       flagReasons.includes(keyword)
     );
 
     // Check explanation for serious crime indicators
     const explanation = (analysisResult.explanation || '').toLowerCase();
-    const hasHarmfulExplanation = harmfulKeywords.some(keyword => 
+    const hasSeriousCrimeExplanation = seriousCrimeKeywords.some(keyword => 
       explanation.includes(keyword)
     );
 
-    // Save if any serious harmful indicators are present
-    const shouldSave = hasTraffickingRisk || hasGroomingRisk || hasCSAMRisk || 
-                      hasHarmfulKeywords || hasHarmfulExplanation;
+    // Check recommended action for immediate alerts
+    const isImmediateAlert = analysisResult.recommended_action === 'alert_immediate';
+
+    // Save only if serious harmful indicators are present
+    const shouldSave = (hasTraffickingRisk || hasGroomingRisk || hasCSAMRisk || 
+                       hasSeriousCrimeKeywords || hasSeriousCrimeExplanation || isImmediateAlert) &&
+                       analysisResult.priority_score >= 70; // High priority threshold
 
     if (shouldSave) {
-      console.log(`Content flagged for saving - detected serious harmful indicators:`, {
+      console.log(`Content flagged for saving - detected serious harmful activities:`, {
         trafficking: hasTraffickingRisk,
         grooming: hasGroomingRisk,
         csam: hasCSAMRisk,
-        harmfulKeywords: hasHarmfulKeywords,
+        seriousCrimeKeywords: hasSeriousCrimeKeywords,
+        immediateAlert: isImmediateAlert,
+        priorityScore: analysisResult.priority_score,
         riskLevel: riskLevel
       });
+    } else {
+      console.log(`Content not saved - does not meet serious crime criteria (risk: ${riskLevel}, priority: ${analysisResult.priority_score})`);
     }
 
     return shouldSave;

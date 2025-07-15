@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import AnalysisTable from "./AnalysisTable";
 import { Search, Filter, Download, AlertTriangle, RefreshCw } from "lucide-react";
 import { fetchAnalyzedData } from "../utils/analyzedDataApi";
@@ -13,34 +13,80 @@ export default function AnalysisSection({ analysisData: propAnalysisData = [] })
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [lastFetch, setLastFetch] = useState(null);
+  const [dataCache, setDataCache] = useState(new Map()); // Cache for displayed data
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Load data from API
-  const loadAnalyzedData = async () => {
+  // Load data from API with caching to prevent duplicate rows during polling
+  const loadAnalyzedData = useCallback(async (forceRefresh = false) => {
+    if (forceRefresh) {
+      setIsRefreshing(true);
+      setDataCache(new Map()); // Clear cache on refresh
+    }
+    
     setLoading(true);
     setError(null);
     try {
       const data = await fetchAnalyzedData();
-      setAnalysisData(data || []);
+      
+      if (forceRefresh) {
+        // Complete refresh - replace all data
+        setAnalysisData(data || []);
+        setDataCache(new Map(data?.map(item => [item.analysis_id, item]) || []));
+      } else {
+        // Incremental update - merge with cache to preserve displayed data
+        const newCache = new Map(dataCache);
+        const newItems = [];
+        
+        (data || []).forEach(item => {
+          if (!newCache.has(item.analysis_id)) {
+            newCache.set(item.analysis_id, item);
+            newItems.push(item);
+          }
+        });
+        
+        if (newItems.length > 0) {
+          setAnalysisData(Array.from(newCache.values()));
+          setDataCache(newCache);
+          console.log(`Added ${newItems.length} new analysis items`);
+        }
+      }
+      
       setLastFetch(new Date());
     } catch (error) {
       console.error('Error loading analyzed data:', error);
       setError('Failed to load analyzed data. Make sure the API server is running.');
       // Fall back to prop data if API fails
-      setAnalysisData(propAnalysisData);
+      if (analysisData.length === 0) {
+        setAnalysisData(propAnalysisData);
+      }
     } finally {
       setLoading(false);
+      setIsRefreshing(false);
     }
-  };
+  }, [dataCache]);
 
-  // Load data on component mount
+  // Load data on component mount and set up polling
   useEffect(() => {
     // If no prop data provided, try to load from API
     if (propAnalysisData.length === 0) {
       loadAnalyzedData();
+      
+      // Set up polling every 10 seconds for new data (incremental)
+      const pollInterval = setInterval(() => {
+        loadAnalyzedData(false); // Incremental load
+      }, 10000);
+      
+      return () => clearInterval(pollInterval);
     } else {
       setAnalysisData(propAnalysisData);
+      setDataCache(new Map(propAnalysisData.map(item => [item.analysis_id, item])));
     }
-  }, [propAnalysisData]);
+  }, [propAnalysisData, loadAnalyzedData]);
+
+  // Manual refresh function for user-triggered full refresh
+  const handleRefresh = () => {
+    loadAnalyzedData(true); // Force full refresh
+  };
 
   const exportToCSV = () => {
     if (!filteredData || filteredData.length === 0) {
@@ -289,12 +335,12 @@ export default function AnalysisSection({ analysisData: propAnalysisData = [] })
           </div>
           <div className="flex items-center gap-2">
             <button 
-              onClick={loadAnalyzedData}
-              disabled={loading}
+              onClick={handleRefresh}
+              disabled={loading || isRefreshing}
               className="flex items-center gap-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm transition-colors"
             >
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-              {loading ? 'Loading...' : 'Refresh'}
+              <RefreshCw className={`w-4 h-4 ${(loading || isRefreshing) ? 'animate-spin' : ''}`} />
+              {(loading || isRefreshing) ? 'Refreshing...' : 'Refresh'}
             </button>
             <button 
               onClick={exportToCSV}
