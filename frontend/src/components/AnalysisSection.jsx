@@ -6,6 +6,8 @@ export default function AnalysisSection({ analysisData = [] }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [riskFilter, setRiskFilter] = useState("all");
   const [platformFilter, setPlatformFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
 
   const exportToCSV = () => {
     if (!filteredData || filteredData.length === 0) {
@@ -137,6 +139,17 @@ export default function AnalysisSection({ analysisData = [] }) {
     return matchesSearch && matchesRisk && matchesPlatform;
   });
 
+  // Reset to first page when filters change
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, riskFilter, platformFilter]);
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
+  const paginatedData = filteredData.slice(startIndex, endIndex);
+
   const riskCounts = {
     high: analysisData.filter(item => item.risk_level === "high").length,
     medium: analysisData.filter(item => item.risk_level === "medium").length,
@@ -214,12 +227,22 @@ export default function AnalysisSection({ analysisData = [] }) {
               <option value="instagram">Instagram</option>
               <option value="twitter">Twitter</option>
             </select>
+            <select
+              className="bg-slate-800 border border-slate-600 rounded-lg px-4 py-3 text-slate-100"
+              value={rowsPerPage}
+              onChange={(e) => setRowsPerPage(Number(e.target.value))}
+            >
+              <option value={10}>10 rows</option>
+              <option value={25}>25 rows</option>
+              <option value={50}>50 rows</option>
+              <option value={100}>100 rows</option>
+            </select>
           </div>
         </div>
         
         <div className="flex justify-between items-center mt-4 pt-4 border-t border-slate-600">
           <div className="text-slate-400 text-sm">
-            Showing {filteredData.length} of {analysisData.length} results
+            Showing {startIndex + 1}-{Math.min(endIndex, filteredData.length)} of {filteredData.length} results
           </div>
           <button 
             onClick={exportToCSV}
@@ -229,6 +252,70 @@ export default function AnalysisSection({ analysisData = [] }) {
             Export
           </button>
         </div>
+        
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center gap-2 mt-4 pt-4 border-t border-slate-600">
+            <button
+              onClick={() => setCurrentPage(1)}
+              disabled={currentPage === 1}
+              className="px-3 py-2 text-sm bg-slate-800 border border-slate-600 rounded-lg text-slate-100 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              First
+            </button>
+            <button
+              onClick={() => setCurrentPage(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-3 py-2 text-sm bg-slate-800 border border-slate-600 rounded-lg text-slate-100 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Previous
+            </button>
+            
+            <div className="flex items-center gap-1">
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                let pageNumber;
+                if (totalPages <= 5) {
+                  pageNumber = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNumber = i + 1;
+                } else if (currentPage >= totalPages - 2) {
+                  pageNumber = totalPages - 4 + i;
+                } else {
+                  pageNumber = currentPage - 2 + i;
+                }
+                
+                return (
+                  <button
+                    key={pageNumber}
+                    onClick={() => setCurrentPage(pageNumber)}
+                    className={`px-3 py-2 text-sm border rounded-lg ${
+                      currentPage === pageNumber
+                        ? 'bg-blue-600 border-blue-500 text-white'
+                        : 'bg-slate-800 border-slate-600 text-slate-100 hover:bg-slate-700'
+                    }`}
+                  >
+                    {pageNumber}
+                  </button>
+                );
+              })}
+            </div>
+            
+            <button
+              onClick={() => setCurrentPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="px-3 py-2 text-sm bg-slate-800 border border-slate-600 rounded-lg text-slate-100 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+            <button
+              onClick={() => setCurrentPage(totalPages)}
+              disabled={currentPage === totalPages}
+              className="px-3 py-2 text-sm bg-slate-800 border border-slate-600 rounded-lg text-slate-100 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Last
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Alert for high-risk items */}
@@ -247,7 +334,7 @@ export default function AnalysisSection({ analysisData = [] }) {
       )}
 
       {/* Analysis Table */}
-      <AnalysisTable analysisData={filteredData} />
+      <AnalysisTable analysisData={paginatedData} />
     </section>
   );
 }

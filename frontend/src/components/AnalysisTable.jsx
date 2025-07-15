@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { AlertTriangle, Eye, Clock, Flag, User, MapPin, Hash, ExternalLink, Info, X, Check, FileText, Upload } from "lucide-react";
+import React, { useState, useRef } from "react";
+import { AlertTriangle, Eye, Clock, Flag, User, MapPin, Hash, ExternalLink, Info, X, Check, FileText, Upload, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, List, ListOrdered } from "lucide-react";
 
 export default function AnalysisTable({ analysisData = [] }) {
   const [sortField, setSortField] = useState("post.scraped_at");
@@ -14,6 +14,29 @@ export default function AnalysisTable({ analysisData = [] }) {
   const [newStatus, setNewStatus] = useState("");
   const [reportText, setReportText] = useState("");
   const [reportFile, setReportFile] = useState(null);
+  const editorRef = useRef(null);
+  const [showReportsModal, setShowReportsModal] = useState(false);
+  const [viewingReports, setViewingReports] = useState([]);
+  const [viewingAnalysisId, setViewingAnalysisId] = useState("");
+
+  // Rich text editor functions
+  const execCommand = (command, value = null) => {
+    document.execCommand(command, false, value);
+    editorRef.current?.focus();
+  };
+
+  const handleEditorInput = () => {
+    if (editorRef.current) {
+      setReportText(editorRef.current.innerHTML);
+    }
+  };
+
+  const clearEditor = () => {
+    if (editorRef.current) {
+      editorRef.current.innerHTML = '';
+      setReportText('');
+    }
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -34,10 +57,14 @@ export default function AnalysisTable({ analysisData = [] }) {
     setShowStatusModal(true);
     setReportText("");
     setReportFile(null);
+    // Clear editor content
+    setTimeout(() => clearEditor(), 100);
   };
 
   const saveStatusChange = async () => {
-    if (!reportText.trim() && !reportFile) {
+    // Check if editor has content (strip HTML tags for validation)
+    const textContent = editorRef.current?.textContent || '';
+    if (!textContent.trim() && !reportFile) {
       alert("Please provide a report (text or file) when changing status.");
       return;
     }
@@ -78,6 +105,7 @@ export default function AnalysisTable({ analysisData = [] }) {
       setNewStatus("");
       setReportText("");
       setReportFile(null);
+      clearEditor();
 
       alert("Status updated and report saved successfully!");
     } catch (error) {
@@ -634,7 +662,9 @@ export default function AnalysisTable({ analysisData = [] }) {
                       onClick={() => {
                         const reports = getCaseReports(item.analysis_id);
                         if (reports.length > 0) {
-                          alert(`Reports for ${item.analysis_id}:\n\n${reports.map((r, i) => `${i + 1}. ${r.timestamp}: ${r.previousStatus} → ${r.newStatus}\n${r.reportText}`).join('\n\n')}`);
+                          setViewingReports(reports);
+                          setViewingAnalysisId(item.analysis_id);
+                          setShowReportsModal(true);
                         } else {
                           alert("No reports available for this case.");
                         }
@@ -707,12 +737,124 @@ export default function AnalysisTable({ analysisData = [] }) {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-slate-300 text-sm font-medium mb-2">Report Text</label>
-                    <textarea
-                      value={reportText}
-                      onChange={(e) => setReportText(e.target.value)}
-                      className="w-full bg-slate-800 border border-slate-600 rounded-lg p-3 text-slate-100 placeholder:text-slate-400 h-32"
-                      placeholder="Describe the actions taken, findings, or reasons for status change..."
-                    />
+                    
+                    {/* Rich Text Editor Toolbar */}
+                    <div className="bg-slate-800 border border-slate-600 rounded-t-lg p-2 flex items-center gap-1 border-b-0">
+                      <button
+                        type="button"
+                        onClick={() => execCommand('bold')}
+                        className="p-1.5 hover:bg-slate-700 rounded text-slate-300 hover:text-slate-100"
+                        title="Bold"
+                      >
+                        <Bold className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => execCommand('italic')}
+                        className="p-1.5 hover:bg-slate-700 rounded text-slate-300 hover:text-slate-100"
+                        title="Italic"
+                      >
+                        <Italic className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => execCommand('underline')}
+                        className="p-1.5 hover:bg-slate-700 rounded text-slate-300 hover:text-slate-100"
+                        title="Underline"
+                      >
+                        <Underline className="w-4 h-4" />
+                      </button>
+                      
+                      <div className="w-px h-6 bg-slate-600 mx-1"></div>
+                      
+                      <button
+                        type="button"
+                        onClick={() => execCommand('justifyLeft')}
+                        className="p-1.5 hover:bg-slate-700 rounded text-slate-300 hover:text-slate-100"
+                        title="Align Left"
+                      >
+                        <AlignLeft className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => execCommand('justifyCenter')}
+                        className="p-1.5 hover:bg-slate-700 rounded text-slate-300 hover:text-slate-100"
+                        title="Align Center"
+                      >
+                        <AlignCenter className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => execCommand('justifyRight')}
+                        className="p-1.5 hover:bg-slate-700 rounded text-slate-300 hover:text-slate-100"
+                        title="Align Right"
+                      >
+                        <AlignRight className="w-4 h-4" />
+                      </button>
+                      
+                      <div className="w-px h-6 bg-slate-600 mx-1"></div>
+                      
+                      <button
+                        type="button"
+                        onClick={() => execCommand('insertUnorderedList')}
+                        className="p-1.5 hover:bg-slate-700 rounded text-slate-300 hover:text-slate-100"
+                        title="Bullet List"
+                      >
+                        <List className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => execCommand('insertOrderedList')}
+                        className="p-1.5 hover:bg-slate-700 rounded text-slate-300 hover:text-slate-100"
+                        title="Numbered List"
+                      >
+                        <ListOrdered className="w-4 h-4" />
+                      </button>
+                      
+                      <div className="flex-1"></div>
+                      
+                      <select
+                        onChange={(e) => execCommand('fontSize', e.target.value)}
+                        className="bg-slate-700 border border-slate-600 rounded px-2 py-1 text-xs text-slate-300"
+                        defaultValue="3"
+                      >
+                        <option value="1">8pt</option>
+                        <option value="2">10pt</option>
+                        <option value="3">12pt</option>
+                        <option value="4">14pt</option>
+                        <option value="5">18pt</option>
+                        <option value="6">24pt</option>
+                        <option value="7">36pt</option>
+                      </select>
+                    </div>
+                    
+                    {/* Rich Text Editor Content Area */}
+                    <div className="relative">
+                      <div
+                        ref={editorRef}
+                        contentEditable
+                        onInput={handleEditorInput}
+                        onFocus={(e) => {
+                          const placeholder = e.target.parentElement.querySelector('.editor-placeholder');
+                          if (placeholder) placeholder.style.display = 'none';
+                        }}
+                        onBlur={(e) => {
+                          const placeholder = e.target.parentElement.querySelector('.editor-placeholder');
+                          if (placeholder && !e.target.textContent.trim()) {
+                            placeholder.style.display = 'block';
+                          }
+                        }}
+                        className="w-full bg-slate-800 border border-slate-600 rounded-b-lg p-3 text-slate-100 min-h-[120px] focus:outline-none focus:ring-2 focus:ring-blue-500 relative z-10"
+                        style={{ 
+                          whiteSpace: 'pre-wrap',
+                          wordWrap: 'break-word'
+                        }}
+                        suppressContentEditableWarning={true}
+                      />
+                      <div className="editor-placeholder absolute top-3 left-3 text-slate-400 italic pointer-events-none z-0">
+                        Describe the actions taken, findings, or reasons for status change...
+                      </div>
+                    </div>
                   </div>
                   
                   <div>
@@ -754,6 +896,75 @@ export default function AnalysisTable({ analysisData = [] }) {
                   Save Status Change
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reports Viewing Modal */}
+      {showReportsModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-900 rounded-lg border border-slate-700 max-w-4xl w-full max-h-[90vh] overflow-auto">
+            <div className="flex justify-between items-center p-6 border-b border-slate-700">
+              <h2 className="text-xl font-bold text-slate-100">Case Reports - {viewingAnalysisId}</h2>
+              <button
+                onClick={() => setShowReportsModal(false)}
+                className="text-slate-400 hover:text-slate-100 transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="p-6">
+              {viewingReports.length === 0 ? (
+                <div className="text-center py-8 text-slate-400">
+                  No reports available for this case.
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {viewingReports.map((report, index) => (
+                    <div key={index} className="bg-slate-800 rounded-lg border border-slate-700 p-4">
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex items-center gap-3">
+                          <span className="text-slate-400 text-sm">Report #{index + 1}</span>
+                          <span className="text-slate-400 text-sm">
+                            {new Date(report.timestamp).toLocaleString()}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(report.previousStatus)}`}>
+                            {report.previousStatus}
+                          </span>
+                          <span className="text-slate-400">→</span>
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(report.newStatus)}`}>
+                            {report.newStatus}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="border-t border-slate-600 pt-3">
+                        <h4 className="text-slate-300 font-medium mb-2">Report Content:</h4>
+                        <div 
+                          className="bg-slate-900 rounded p-3 text-slate-100 prose prose-invert max-w-none"
+                          dangerouslySetInnerHTML={{ __html: report.reportText }}
+                          style={{
+                            fontSize: '14px',
+                            lineHeight: '1.5'
+                          }}
+                        />
+                        
+                        {report.fileName && (
+                          <div className="mt-3 pt-3 border-t border-slate-600">
+                            <div className="flex items-center gap-2 text-slate-400 text-sm">
+                              <FileText className="w-4 h-4" />
+                              <span>Attached file: {report.fileName}</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
