@@ -1,0 +1,16 @@
+{
+  "name": "mention-monitor",
+  "version": "1.0.0",
+  "description": "Monitor Google Sheets for mentions and scrape posts",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "googleapis": "^128.0.0",
+    "playwright": "^1.40.0",
+    "dotenv": "^16.3.1"
+  },
+  "type": "module"
+}
