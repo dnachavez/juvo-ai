@@ -202,9 +202,49 @@ const AnalysisTable = React.memo(function AnalysisTable({ analysisData = [] }) {
     return media.map((m, idx) => (
       <div key={idx} className="text-xs">
         <div>{m.type || ""}</div>
-        {m.url && <ExternalLink className="w-3 h-3 inline" />}
+        {m.url && (
+          <a 
+            href={m.url} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-blue-400 hover:text-blue-300"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <ExternalLink className="w-3 h-3 inline" />
+          </a>
+        )}
       </div>
     ));
+  };
+
+  const renderModalMediaInfo = (media) => {
+    if (!media || media.length === 0) return <span className="text-slate-100">None</span>;
+    return (
+      <div className="space-y-2">
+        {media.map((m, idx) => (
+          <div key={idx} className="bg-slate-800 rounded p-2 border border-slate-600">
+            <div className="text-sm font-medium text-slate-300">Media {idx + 1}</div>
+            <div className="text-sm text-slate-100">Type: {m.type || 'Unknown'}</div>
+            {m.url ? (
+              <div className="text-sm">
+                <span className="text-slate-300">URL: </span>
+                <a 
+                  href={m.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-400 hover:text-blue-300 underline break-all"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {m.url}
+                </a>
+              </div>
+            ) : (
+              <div className="text-sm text-slate-100">URL: No URL</div>
+            )}
+          </div>
+        ))}
+      </div>
+    );
   };
 
   const getMediaFullText = (media) => {
@@ -335,8 +375,23 @@ const AnalysisTable = React.memo(function AnalysisTable({ analysisData = [] }) {
                 <div><span className="font-medium text-slate-300">Scraped At:</span> <span className="text-slate-100">{formatDate(item.post?.scraped_at)}</span></div>
                 <div><span className="font-medium text-slate-300">Published At:</span> <span className="text-slate-100">{formatDate(item.post?.published_at)}</span></div>
                 <div><span className="font-medium text-slate-300">Language:</span> <span className="text-slate-100">{formatValue(item.language_detected)}</span></div>
-                <div className="md:col-span-2"><span className="font-medium text-slate-300">Permalink:</span> <span className="text-slate-100 break-all">{formatValue(item.post?.permalink)}</span></div>
+                <div className="md:col-span-2"><span className="font-medium text-slate-300">Permalink:</span> 
+                  {item.post?.permalink ? (
+                    <a 
+                      href={item.post.permalink} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-400 hover:text-blue-300 underline break-all"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {item.post.permalink}
+                    </a>
+                  ) : (
+                    <span className="text-slate-100">N/A</span>
+                  )}
+                </div>
                 <div className="md:col-span-2"><span className="font-medium text-slate-300">Full Text:</span> <div className="text-slate-100 mt-1 p-3 bg-slate-800 rounded border border-slate-600">{formatValue(item.post?.full_text)}</div></div>
+                <div className="md:col-span-2"><span className="font-medium text-slate-300">Media:</span> <div className="mt-1">{renderModalMediaInfo(item.post?.media)}</div></div>
               </div>
             </div>
 
@@ -346,7 +401,21 @@ const AnalysisTable = React.memo(function AnalysisTable({ analysisData = [] }) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div><span className="font-medium text-slate-300">Poster Name:</span> <span className="text-slate-100">{formatValue(item.actors?.poster?.name)}</span></div>
                 <div><span className="font-medium text-slate-300">Poster ID:</span> <span className="text-slate-100">{formatValue(item.actors?.poster?.profile_id)}</span></div>
-                <div className="md:col-span-2"><span className="font-medium text-slate-300">Poster URL:</span> <span className="text-slate-100 break-all">{formatValue(item.actors?.poster?.profile_url)}</span></div>
+                <div className="md:col-span-2"><span className="font-medium text-slate-300">Poster URL:</span> 
+                  {item.actors?.poster?.profile_url ? (
+                    <a 
+                      href={item.actors.poster.profile_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-400 hover:text-blue-300 underline break-all"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {item.actors.poster.profile_url}
+                    </a>
+                  ) : (
+                    <span className="text-slate-100">N/A</span>
+                  )}
+                </div>
                 <div><span className="font-medium text-slate-300">Sharers:</span> <span className="text-slate-100">{formatValue(item.actors?.sharers)}</span></div>
                 <div><span className="font-medium text-slate-300">Mentioned People:</span> <span className="text-slate-100">{formatValue(item.actors?.mentioned_people)}</span></div>
               </div>
@@ -539,7 +608,15 @@ const AnalysisTable = React.memo(function AnalysisTable({ analysisData = [] }) {
                 <td className="py-2 px-2 text-slate-300 text-xs">
                   {item.post?.permalink ? (
                     <TruncatedCell fullText={item.post.permalink}>
-                      <ExternalLink className="w-3 h-3 text-blue-400" />
+                      <a 
+                        href={item.post.permalink} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-blue-400 hover:text-blue-300"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
                     </TruncatedCell>
                   ) : ""}
                 </td>
@@ -572,7 +649,15 @@ const AnalysisTable = React.memo(function AnalysisTable({ analysisData = [] }) {
                 <td className="py-2 px-2 text-slate-300 text-xs">
                   {item.actors?.poster?.profile_url ? (
                     <TruncatedCell fullText={item.actors?.poster?.profile_url}>
-                      <ExternalLink className="w-3 h-3 text-blue-400" />
+                      <a 
+                        href={item.actors.poster.profile_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-blue-400 hover:text-blue-300"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
                     </TruncatedCell>
                   ) : ""}
                 </td>
