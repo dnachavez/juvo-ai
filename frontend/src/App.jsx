@@ -3,7 +3,10 @@ import Header from "./components/Header";
 import FloatingNavigation from "./components/FloatingNavigation";
 import AnalysisSection from "./components/AnalysisSection";
 import HeatmapSection from "./components/HeatmapSection";
-import analysisData from "./data/analysisData.json";
+import ToastContainer from "./components/ToastContainer";
+import useNotifications from "./hooks/useNotifications";
+import useHeatmapData from "./hooks/useHeatmapData";
+// analysisData will be fetched dynamically by AnalysisSection
 import { motion, AnimatePresence } from "framer-motion";
 import JuvoIcon from "./assets/juvo.svg";
 import {
@@ -15,6 +18,8 @@ import {
 export default function App() {
   // State and data
   const [loader, setLoader] = useState(true);
+  const { toasts, removeToast } = useNotifications();
+  const { heatmapPoints, loading: heatmapLoading, error: heatmapError, locationStats } = useHeatmapData();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -40,24 +45,7 @@ export default function App() {
 
 
 
-  // Risk points for heatmap - Cebu City locations only
-  const riskPoints = [
-    { lat: 10.2914, lng: 123.8989, risk: "high", label: "Carbon Market", count: 3 },
-    {
-      lat: 10.3098,
-      lng: 123.8931,
-      risk: "medium",
-      label: "Fuente Osmeña Circle",
-      count: 1
-    },
-    { lat: 10.3304, lng: 123.9074, risk: "low", label: "IT Park - Apas", count: 1 },
-    { lat: 10.3156, lng: 123.8854, risk: "high", label: "Colon Street", count: 2 },
-    { lat: 10.2893, lng: 123.9058, risk: "medium", label: "Lahug District", count: 1 },
-    { lat: 10.3202, lng: 123.9066, risk: "low", label: "Ayala Center Cebu", count: 1 },
-    { lat: 10.3040, lng: 123.8935, risk: "medium", label: "Capitol Site", count: 2 },
-    { lat: 10.3377, lng: 123.9354, risk: "high", label: "Banilad", count: 1 },
-    { lat: 10.2778, lng: 123.8842, risk: "low", label: "Guadalupe", count: 1 }
-  ];
+  // Risk color mapping
   const riskColor = {
     high: "red",
     medium: "yellow",
@@ -93,9 +81,16 @@ export default function App() {
             scrollToSection={scrollToSection}
           />
           <main className="p-4 sm:p-6 lg:p-8 space-y-8 sm:space-y-12 lg:space-y-16">
-            <AnalysisSection analysisData={analysisData} />
-            <HeatmapSection riskPoints={riskPoints} riskColor={riskColor} />
+            <AnalysisSection />
+            <HeatmapSection 
+              riskPoints={heatmapPoints} 
+              riskColor={riskColor}
+              loading={heatmapLoading}
+              error={heatmapError}
+              locationStats={locationStats}
+            />
           </main>
+          <ToastContainer toasts={toasts} onCloseToast={removeToast} />
         </motion.div>
       )}
     </AnimatePresence>

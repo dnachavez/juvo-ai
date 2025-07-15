@@ -52,6 +52,11 @@ async function main() {
         await runTest(processor);
         break;
         
+      case 'test-filter':
+        console.log('Testing harmful content filtering logic...');
+        await runFilterTest(processor);
+        break;
+        
       default:
         console.log('Juvo AI Content Analysis Tool');
         console.log('');
@@ -60,6 +65,7 @@ async function main() {
         console.log('  node index.js watch          - Watch for new files and process automatically');
         console.log('  node index.js single <file>  - Process a single JSON file');
         console.log('  node index.js test           - Run test with sample data');
+        console.log('  node index.js test-filter    - Test harmful content filtering logic');
         console.log('');
         console.log('Environment Variables:');
         console.log('  GEMINI_API_KEY - Your Google Gemini API key (required)');
@@ -71,6 +77,105 @@ async function main() {
   }
 }
 
+async function runFilterTest(processor) {
+  console.log('Testing harmful content filtering logic...');
+  
+  // Test cases for filtering
+  const testCases = [
+    {
+      name: "High Risk - Trafficking Indicators",
+      analysisResult: {
+        flagged: true,
+        risk_level: "high",
+        risk_scores: { trafficking: 0.8, grooming: 0.2, csam: 0.1, harassment: 0.1 },
+        flag_reason: ["trafficking indicators", "suspicious contact"],
+        explanation: "Post contains trafficking indicators and suspicious contact patterns",
+        post: { id: "test1" }
+      },
+      expectedSave: true
+    },
+    {
+      name: "Medium Risk - Grooming Indicators", 
+      analysisResult: {
+        flagged: true,
+        risk_level: "medium",
+        risk_scores: { trafficking: 0.1, grooming: 0.7, csam: 0.2, harassment: 0.1 },
+        flag_reason: ["grooming behavior", "inappropriate contact with minor"],
+        explanation: "Potential grooming behavior detected",
+        post: { id: "test2" }
+      },
+      expectedSave: true
+    },
+    {
+      name: "Low Risk - General Harassment",
+      analysisResult: {
+        flagged: true, 
+        risk_level: "low",
+        risk_scores: { trafficking: 0.1, grooming: 0.1, csam: 0.0, harassment: 0.6 },
+        flag_reason: ["mild harassment"],
+        explanation: "General harassment detected but not serious crime related",
+        post: { id: "test3" }
+      },
+      expectedSave: false
+    },
+    {
+      name: "Not Flagged - Safe Content",
+      analysisResult: {
+        flagged: false,
+        risk_level: "low", 
+        risk_scores: { trafficking: 0.0, grooming: 0.0, csam: 0.0, harassment: 0.0 },
+        flag_reason: [],
+        explanation: "Content appears safe",
+        post: { id: "test4" }
+      },
+      expectedSave: false
+    },
+    {
+      name: "Critical Risk - CSAM Indicators",
+      analysisResult: {
+        flagged: true,
+        risk_level: "critical",
+        risk_scores: { trafficking: 0.2, grooming: 0.3, csam: 0.9, harassment: 0.1 },
+        flag_reason: ["csam", "child abuse material"],
+        explanation: "Critical CSAM indicators detected",
+        post: { id: "test5" }
+      },
+      expectedSave: true
+    }
+  ];
+
+  console.log(`Running ${testCases.length} filter test cases...\n`);
+  
+  let passed = 0;
+  let failed = 0;
+  
+  for (const testCase of testCases) {
+    const shouldSave = processor.analyzer.shouldSaveAnalysis(testCase.analysisResult);
+    const result = shouldSave === testCase.expectedSave ? "PASS" : "FAIL";
+    
+    console.log(`${result}: ${testCase.name}`);
+    console.log(`  Expected Save: ${testCase.expectedSave}, Actual Save: ${shouldSave}`);
+    
+    if (result === "PASS") {
+      passed++;
+    } else {
+      failed++;
+      console.log(`  Risk Level: ${testCase.analysisResult.risk_level}`);
+      console.log(`  Risk Scores:`, testCase.analysisResult.risk_scores);
+      console.log(`  Flag Reasons:`, testCase.analysisResult.flag_reason);
+    }
+    console.log();
+  }
+  
+  console.log(`Test Results: ${passed} passed, ${failed} failed`);
+  
+  if (failed === 0) {
+    console.log('✅ All filter tests passed! Harmful content filtering is working correctly.');
+  } else {
+    console.log('❌ Some filter tests failed. Please review the filtering logic.');
+  }
+}
+
 async function runTest(processor) {
   try {
     // Create test data that matches the scraped post format
@@ -79,7 +184,7 @@ async function runTest(processor) {
       permalink: "https://www.facebook.com/test/posts/123456789",
       scrapedAt: new Date().toISOString(),
       publishedAt: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
-      fullText: "Looking for young models for photo shoot. Good pay! DM me for details. Must be 16-18 years old.",
+      fullText: "Looking for young models for photo shoot. Good pay! DM me for details. Must be 16-18 years old. Private sessions available.",
       mediaUrls: [
         {
           originalUrl: "https://example.com/image.jpg",

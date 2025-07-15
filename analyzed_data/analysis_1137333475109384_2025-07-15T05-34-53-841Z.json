@@ -1,0 +1,77 @@
+{
+  "analysis_id": "c7e7e72f-c539-4630-b972-a22bcf4bf60c",
+  "source": {
+    "platform": "facebook",
+    "collection_method": "browser_use",
+    "scrape_session_id": "sess-2025-07-15T05:00Z"
+  },
+  "post": {
+    "id": "1137333475109384",
+    "permalink": "https://www.facebook.com/1137334508442614/posts/1137333475109384",
+    "scraped_at": "2025-07-15T05:34:45.141Z",
+    "published_at": "2025-07-15T05:16:50.192Z",
+    "full_text": "Online sumbagay Juvo",
+    "media": []
+  },
+  "actors": {
+    "poster": {
+      "name": "Hanz Christian Angelo",
+      "profile_id": "h4nz.dev",
+      "profile_url": "https://web.facebook.com/h4nz.dev"
+    },
+    "sharers": [],
+    "mentioned_people": []
+  },
+  "language_detected": "tl",
+  "location_detected": null,
+  "keywords_matched": [],
+  "risk_scores": {
+    "grooming": 0,
+    "trafficking": 0,
+    "csam": 0,
+    "harassment": 0
+  },
+  "risk_level": "low",
+  "flagged": false,
+  "flag_reason": [],
+  "explanation": "The post contains the phrase 'Online sumbagay Juvo'. 'Sumbagay' in Tagalog can mean 'to punch' or 'to hit'. Without further context, it's difficult to assess a specific threat. 'Juvo' could be a name or reference, but without context, presents low risk.",
+  "model_outputs": {
+    "gemini": {
+      "language_detected": "tl",
+      "mentioned_people": [],
+      "location_detected": null,
+      "keywords_matched": [],
+      "risk_scores": {
+        "grooming": 0,
+        "trafficking": 0,
+        "csam": 0,
+        "harassment": 0
+      },
+      "risk_level": "low",
+      "flagged": false,
+      "flag_reason": [],
+      "explanation": "The post contains the phrase 'Online sumbagay Juvo'. 'Sumbagay' in Tagalog can mean 'to punch' or 'to hit'. Without further context, it's difficult to assess a specific threat. 'Juvo' could be a name or reference, but without context, presents low risk.",
+      "recommended_action": "no_action",
+      "priority_score": 10,
+      "compliance": {
+        "ra11930": true,
+        "data_privacy_exemption": false
+      }
+    },
+    "photodna": {
+      "match": false
+    }
+  },
+  "matched_hashes": [],
+  "recommended_action": "no_action",
+  "priority_score": 10,
+  "compliance": {
+    "ra11930": true,
+    "data_privacy_exemption": true
+  },
+  "ai_version": {
+    "gemini_model": "gemini-2.0-flash-exp"
+  },
+  "processing_ms": 3649,
+  "signature": "db98324a"
+}

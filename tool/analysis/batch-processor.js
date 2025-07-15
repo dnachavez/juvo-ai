@@ -1,10 +1,12 @@
 import fs from 'fs';
 import path from 'path';
 import { ContentAnalyzer } from './content-analyzer.js';
+import { NotificationClient } from './notification-client.js';
 
 export class BatchProcessor {
   constructor(apiKey) {
     this.analyzer = new ContentAnalyzer(apiKey);
+    this.notificationClient = new NotificationClient();
     this.scrapedDataPath = path.join(process.cwd(), '..', '..', 'scraped_posts');
   }
 
@@ -23,10 +25,18 @@ export class BatchProcessor {
       const results = [];
       for (const filePath of jsonFiles) {
         try {
-          console.log(`Processing: ${path.basename(filePath)}`);
+          const filename = path.basename(filePath);
+          console.log(`Processing: ${filename}`);
+          
+          // Send notification that analysis started
+          await this.notificationClient.notifyAnalysisStarted(filename);
+          
           const scrapedData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
           const analysis = await this.analyzer.analyzePost(scrapedData);
           results.push(analysis);
+          
+          // Send notification that analysis completed
+          await this.notificationClient.notifyAnalysisCompleted(filename, analysis);
           
           // Add small delay to avoid rate limiting
           await this.delay(1000);
@@ -47,16 +57,23 @@ export class BatchProcessor {
 
   async processSingleFile(filePath) {
     try {
-      console.log(`Processing single file: ${filePath}`);
+      const filename = path.basename(filePath);
+      console.log(`Processing single file: ${filename}`);
       
       if (!fs.existsSync(filePath)) {
         throw new Error(`File not found: ${filePath}`);
       }
 
+      // Send notification that analysis started
+      await this.notificationClient.notifyAnalysisStarted(filename);
+
       const scrapedData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
       const analysis = await this.analyzer.analyzePost(scrapedData);
       
-      console.log(`Single file processing completed: ${filePath}`);
+      // Send notification that analysis completed
+      await this.notificationClient.notifyAnalysisCompleted(filename, analysis);
+      
+      console.log(`Single file processing completed: ${filename}`);
       return analysis;
 
     } catch (error) {

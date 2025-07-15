@@ -1,0 +1,18 @@
+{
+  "name": "juvo-ai-api",
+  "version": "1.0.0",
+  "description": "API server for Juvo AI analyzed data",
+  "main": "api-server.js",
+  "scripts": {
+    "start": "node api-server.js",
+    "dev": "node api-server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "chokidar": "^3.5.3"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

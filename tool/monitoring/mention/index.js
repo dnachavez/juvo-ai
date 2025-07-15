@@ -1,7 +1,13 @@
 import { SheetsMonitor } from './sheets-monitor.js';
 import { PostScraper } from './post-scraper.js';
+import { NotificationClient } from './notification-client.js';
 import dotenv from 'dotenv';
 import path from 'path';
+import { spawn } from 'child_process';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
@@ -9,6 +15,7 @@ class MentionMonitor {
   constructor() {
     this.sheetsMonitor = null;
     this.postScraper = null;
+    this.notificationClient = new NotificationClient();
     this.isRunning = false;
     
     // Configuration from environment variables
@@ -69,6 +76,15 @@ class MentionMonitor {
         
         const savedPath = await this.postScraper.savePostData(postData);
         console.log(`Successfully processed and saved post: ${savedPath}`);
+        
+        // Send notification that data was scraped and saved
+        await this.notificationClient.notifyDataScraped(
+          path.basename(savedPath),
+          record.id
+        );
+        
+        // Automatically run analysis on the scraped data
+        await this.runAnalysis(savedPath, record.id);
         
         return {
           success: true,
@@ -137,6 +153,10 @@ class MentionMonitor {
         
         if (newRecords.length > 0) {
           console.log(`Processing ${newRecords.length} new record(s)...`);
+          
+          // Send notification that scraping started
+          await this.notificationClient.notifyScrapingStarted(newRecords.length);
+          
           const results = await this.processNewRecords(newRecords);
           
           const successful = results.filter(r => r.success).length;
@@ -166,6 +186,62 @@ class MentionMonitor {
     }
     
     console.log('Mention monitoring stopped');
+  }
+
+  // Run analysis on scraped data
+  async runAnalysis(scrapedFilePath, recordId) {
+    try {
+      console.log(`Starting analysis for ${path.basename(scrapedFilePath)}...`);
+      
+      // Send notification that analysis started
+      await this.notificationClient.notifyAnalysisStarted(path.basename(scrapedFilePath));
+      
+      // Get the analysis tool path (go up to root, then to analysis folder)
+      const analysisToolPath = path.join(__dirname, '..', '..', 'analysis', 'integrated-analyzer.js');
+      
+      return new Promise((resolve, reject) => {
+        const analysisProcess = spawn('node', [analysisToolPath], {
+          cwd: path.dirname(analysisToolPath),
+          stdio: ['pipe', 'pipe', 'pipe']
+        });
+        
+        let stdout = '';
+        let stderr = '';
+        
+        analysisProcess.stdout.on('data', (data) => {
+          stdout += data.toString();
+        });
+        
+        analysisProcess.stderr.on('data', (data) => {
+          stderr += data.toString();
+        });
+        
+        analysisProcess.on('close', async (code) => {
+          if (code === 0) {
+            console.log(`Analysis completed successfully for record ${recordId}`);
+            console.log('Analysis output:', stdout);
+            
+            // Send notification that analysis completed
+            await this.notificationClient.notifyNewAnalysis(path.basename(scrapedFilePath));
+            
+            resolve({ success: true, output: stdout });
+          } else {
+            console.error(`Analysis failed for record ${recordId} with code ${code}`);
+            console.error('Analysis error:', stderr);
+            reject(new Error(`Analysis process exited with code ${code}: ${stderr}`));
+          }
+        });
+        
+        analysisProcess.on('error', (error) => {
+          console.error(`Failed to start analysis process:`, error);
+          reject(error);
+        });
+      });
+      
+    } catch (error) {
+      console.error(`Error running analysis for record ${recordId}:`, error.message);
+      throw error;
+    }
   }
 
   // Method to process a single URL manually (for testing)

@@ -237,17 +237,83 @@ Focus on detecting patterns like:
 
   async saveAnalysis(analysisResult) {
     try {
+      // Only save analysis if content is flagged as harmful and relates to serious crimes
+      if (!this.shouldSaveAnalysis(analysisResult)) {
+        console.log(`Analysis not saved - content does not meet harmful criteria threshold`);
+        return null;
+      }
+
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
       const filename = `analysis_${analysisResult.post.id}_${timestamp}.json`;
       const filepath = path.join(this.analyzedDataPath, filename);
       
       fs.writeFileSync(filepath, JSON.stringify(analysisResult, null, 2));
-      console.log(`Saved analysis to: ${filepath}`);
+      console.log(`Saved harmful content analysis to: ${filepath}`);
       
       return filepath;
     } catch (error) {
       console.error('Error saving analysis:', error.message);
       throw error;
     }
+  }
+
+  /**
+   * Determines if analysis should be saved based on harmful content criteria
+   * Only saves content flagged for serious crimes like trafficking, grooming, CSAM, etc.
+   */
+  shouldSaveAnalysis(analysisResult) {
+    // Must be flagged as concerning content
+    if (!analysisResult.flagged) {
+      return false;
+    }
+
+    // Must have medium, high, or critical risk level
+    const riskLevel = analysisResult.risk_level?.toLowerCase();
+    if (!['medium', 'high', 'critical'].includes(riskLevel)) {
+      return false;
+    }
+
+    // Check for specific harmful content indicators
+    const riskScores = analysisResult.risk_scores || {};
+    const harmfulThreshold = 0.3; // Lower threshold for serious crimes
+
+    const hasTraffickingRisk = riskScores.trafficking >= harmfulThreshold;
+    const hasGroomingRisk = riskScores.grooming >= harmfulThreshold;
+    const hasCSAMRisk = riskScores.csam >= harmfulThreshold;
+    
+    // Check for harmful keywords in flag reasons
+    const flagReasons = (analysisResult.flag_reason || []).join(' ').toLowerCase();
+    const harmfulKeywords = [
+      'trafficking', 'exploitation', 'grooming', 'csam', 'child abuse',
+      'sexual exploitation', 'human trafficking', 'forced labor',
+      'commercial sexual exploitation', 'online predator', 'child predator',
+      'solicitation', 'inappropriate contact with minor'
+    ];
+    
+    const hasHarmfulKeywords = harmfulKeywords.some(keyword => 
+      flagReasons.includes(keyword)
+    );
+
+    // Check explanation for serious crime indicators
+    const explanation = (analysisResult.explanation || '').toLowerCase();
+    const hasHarmfulExplanation = harmfulKeywords.some(keyword => 
+      explanation.includes(keyword)
+    );
+
+    // Save if any serious harmful indicators are present
+    const shouldSave = hasTraffickingRisk || hasGroomingRisk || hasCSAMRisk || 
+                      hasHarmfulKeywords || hasHarmfulExplanation;
+
+    if (shouldSave) {
+      console.log(`Content flagged for saving - detected serious harmful indicators:`, {
+        trafficking: hasTraffickingRisk,
+        grooming: hasGroomingRisk,
+        csam: hasCSAMRisk,
+        harmfulKeywords: hasHarmfulKeywords,
+        riskLevel: riskLevel
+      });
+    }
+
+    return shouldSave;
   }
 }

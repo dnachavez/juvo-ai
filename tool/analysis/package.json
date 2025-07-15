@@ -11,7 +11,8 @@
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
     "uuid": "^10.0.0",
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "node-fetch": "^3.3.2"
   },
   "keywords": ["ai", "analysis", "content-moderation", "gemini"],
   "author": "",

@@ -1,13 +1,46 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AnalysisTable from "./AnalysisTable";
-import { Search, Filter, Download, AlertTriangle } from "lucide-react";
+import { Search, Filter, Download, AlertTriangle, RefreshCw } from "lucide-react";
+import { fetchAnalyzedData } from "../utils/analyzedDataApi";
 
-export default function AnalysisSection({ analysisData = [] }) {
+export default function AnalysisSection({ analysisData: propAnalysisData = [] }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [riskFilter, setRiskFilter] = useState("all");
   const [platformFilter, setPlatformFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [analysisData, setAnalysisData] = useState(propAnalysisData);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [lastFetch, setLastFetch] = useState(null);
+
+  // Load data from API
+  const loadAnalyzedData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await fetchAnalyzedData();
+      setAnalysisData(data || []);
+      setLastFetch(new Date());
+    } catch (error) {
+      console.error('Error loading analyzed data:', error);
+      setError('Failed to load analyzed data. Make sure the API server is running.');
+      // Fall back to prop data if API fails
+      setAnalysisData(propAnalysisData);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load data on component mount
+  useEffect(() => {
+    // If no prop data provided, try to load from API
+    if (propAnalysisData.length === 0) {
+      loadAnalyzedData();
+    } else {
+      setAnalysisData(propAnalysisData);
+    }
+  }, [propAnalysisData]);
 
   const exportToCSV = () => {
     if (!filteredData || filteredData.length === 0) {
@@ -126,15 +159,20 @@ export default function AnalysisSection({ analysisData = [] }) {
   };
 
   const filteredData = analysisData.filter((item) => {
+    // Handle missing data gracefully
+    const postText = item.post?.full_text || '';
+    const posterName = item.actors?.poster?.name || '';
+    const keywords = item.keywords_matched || [];
+    
     const matchesSearch = 
-      item.post.full_text.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.actors.poster.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.keywords_matched.some(keyword => 
+      postText.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      posterName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      keywords.some(keyword => 
         keyword.toLowerCase().includes(searchTerm.toLowerCase())
       );
     
     const matchesRisk = riskFilter === "all" || item.risk_level === riskFilter;
-    const matchesPlatform = platformFilter === "all" || item.source.platform === platformFilter;
+    const matchesPlatform = platformFilter === "all" || item.source?.platform === platformFilter;
     
     return matchesSearch && matchesRisk && matchesPlatform;
   });
@@ -243,14 +281,29 @@ export default function AnalysisSection({ analysisData = [] }) {
         <div className="flex justify-between items-center mt-4 pt-4 border-t border-slate-600">
           <div className="text-slate-400 text-sm">
             Showing {startIndex + 1}-{Math.min(endIndex, filteredData.length)} of {filteredData.length} results
+            {lastFetch && (
+              <div className="text-xs mt-1">
+                Last updated: {lastFetch.toLocaleTimeString()}
+              </div>
+            )}
           </div>
-          <button 
-            onClick={exportToCSV}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition-colors"
-          >
-            <Download className="w-4 h-4" />
-            Export
-          </button>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={loadAnalyzedData}
+              disabled={loading}
+              className="flex items-center gap-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm transition-colors"
+            >
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              {loading ? 'Loading...' : 'Refresh'}
+            </button>
+            <button 
+              onClick={exportToCSV}
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition-colors"
+            >
+              <Download className="w-4 h-4" />
+              Export
+            </button>
+          </div>
         </div>
         
         {/* Pagination Controls */}
@@ -317,6 +370,25 @@ export default function AnalysisSection({ analysisData = [] }) {
           </div>
         )}
       </div>
+
+      {/* Error Alert */}
+      {error && (
+        <div className="bg-red-600/10 border border-red-600/30 rounded-lg p-4 mb-6">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0" />
+            <div>
+              <div className="text-red-400 font-medium">Data Loading Error</div>
+              <div className="text-red-300 text-sm">{error}</div>
+            </div>
+            <button 
+              onClick={loadAnalyzedData}
+              className="ml-auto bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Alert for high-risk items */}
       {filteredData.some(item => item.risk_level === "high" && item.flagged) && (

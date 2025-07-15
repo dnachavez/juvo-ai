@@ -1,0 +1,87 @@
+{
+  "analysis_id": "8d19bad3-888b-4f87-a86f-e21621a4cad9",
+  "source": {
+    "platform": "facebook",
+    "collection_method": "browser_use",
+    "scrape_session_id": "sess-2025-07-15T05:00Z"
+  },
+  "post": {
+    "id": "1267858128324677",
+    "permalink": "https://www.facebook.com/1267859034991253/posts/1267858128324677",
+    "scraped_at": "2025-07-15T05:34:27.870Z",
+    "published_at": "2025-07-15T05:17:32.919Z",
+    "full_text": "Juvo sumbagay ta Hanz Christian Angelo",
+    "media": []
+  },
+  "actors": {
+    "poster": {
+      "name": "Hanz Christian Angelo",
+      "profile_id": "h4nz.dev",
+      "profile_url": "https://web.facebook.com/h4nz.dev"
+    },
+    "sharers": [
+      {
+        "name": "Allain Ralph Legaspi",
+        "profile_id": "Allain004",
+        "profile_url": "https://web.facebook.com/Allain004"
+      }
+    ],
+    "mentioned_people": [
+      "Hanz Christian Angelo"
+    ]
+  },
+  "language_detected": "tl",
+  "location_detected": null,
+  "keywords_matched": [],
+  "risk_scores": {
+    "grooming": 0,
+    "trafficking": 0,
+    "csam": 0,
+    "harassment": 0
+  },
+  "risk_level": "low",
+  "flagged": false,
+  "flag_reason": [],
+  "explanation": "The post appears to be in Tagalog. The text 'Juvo sumbagay ta' does not immediately indicate any risk factors based on common risk patterns. Mentioned person is the original poster, indicating a self-reference.",
+  "model_outputs": {
+    "gemini": {
+      "language_detected": "tl",
+      "mentioned_people": [
+        "Hanz Christian Angelo"
+      ],
+      "location_detected": null,
+      "keywords_matched": [],
+      "risk_scores": {
+        "grooming": 0,
+        "trafficking": 0,
+        "csam": 0,
+        "harassment": 0
+      },
+      "risk_level": "low",
+      "flagged": false,
+      "flag_reason": [],
+      "explanation": "The post appears to be in Tagalog. The text 'Juvo sumbagay ta' does not immediately indicate any risk factors based on common risk patterns. Mentioned person is the original poster, indicating a self-reference.",
+      "recommended_action": "no_action",
+      "priority_score": 0,
+      "compliance": {
+        "ra11930": false,
+        "data_privacy_exemption": false
+      }
+    },
+    "photodna": {
+      "match": false
+    }
+  },
+  "matched_hashes": [],
+  "recommended_action": "no_action",
+  "priority_score": 0,
+  "compliance": {
+    "ra11930": true,
+    "data_privacy_exemption": true
+  },
+  "ai_version": {
+    "gemini_model": "gemini-2.0-flash-exp"
+  },
+  "processing_ms": 3237,
+  "signature": "9e50a093"
+}

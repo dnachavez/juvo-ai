@@ -1,0 +1,77 @@
+{
+  "analysis_id": "27498b42-3950-453d-9ea9-533ac7f6a1cc",
+  "source": {
+    "platform": "facebook",
+    "collection_method": "browser_use",
+    "scrape_session_id": "sess-2025-07-15T05:00Z"
+  },
+  "post": {
+    "id": "122187168434303452",
+    "permalink": "https://www.facebook.com/122187123212303452/posts/122187168434303452",
+    "scraped_at": "2025-07-15T05:32:18.553Z",
+    "published_at": "2025-07-15T05:16:23.607Z",
+    "full_text": "Juvo looking for issues",
+    "media": []
+  },
+  "actors": {
+    "poster": {
+      "name": "Dan Chavez",
+      "profile_id": "dnachavez.dev",
+      "profile_url": "https://web.facebook.com/dnachavez.dev"
+    },
+    "sharers": [],
+    "mentioned_people": []
+  },
+  "language_detected": "en",
+  "location_detected": null,
+  "keywords_matched": [],
+  "risk_scores": {
+    "grooming": 0,
+    "trafficking": 0,
+    "csam": 0,
+    "harassment": 0
+  },
+  "risk_level": "low",
+  "flagged": false,
+  "flag_reason": [],
+  "explanation": "The post 'Juvo looking for issues' does not contain any identifiable risk factors. It doesn't reference age, location, or make any requests that are concerning.  The post appears benign.",
+  "model_outputs": {
+    "gemini": {
+      "language_detected": "en",
+      "mentioned_people": [],
+      "location_detected": null,
+      "keywords_matched": [],
+      "risk_scores": {
+        "grooming": 0,
+        "trafficking": 0,
+        "csam": 0,
+        "harassment": 0
+      },
+      "risk_level": "low",
+      "flagged": false,
+      "flag_reason": [],
+      "explanation": "The post 'Juvo looking for issues' does not contain any identifiable risk factors. It doesn't reference age, location, or make any requests that are concerning.  The post appears benign.",
+      "recommended_action": "no_action",
+      "priority_score": 1,
+      "compliance": {
+        "ra11930": true,
+        "data_privacy_exemption": false
+      }
+    },
+    "photodna": {
+      "match": false
+    }
+  },
+  "matched_hashes": [],
+  "recommended_action": "no_action",
+  "priority_score": 1,
+  "compliance": {
+    "ra11930": true,
+    "data_privacy_exemption": true
+  },
+  "ai_version": {
+    "gemini_model": "gemini-2.0-flash-exp"
+  },
+  "processing_ms": 6044,
+  "signature": "60f3d2c4"
+}
