@@ -3,7 +3,7 @@ import AnalysisTable from "./AnalysisTable";
 import { Search, Filter, Download, AlertTriangle, RefreshCw } from "lucide-react";
 import { fetchAnalyzedData } from "../utils/analyzedDataApi";
 
-export default function AnalysisSection({ analysisData: propAnalysisData = [] }) {
+const AnalysisSection = React.memo(function AnalysisSection({ analysisData: propAnalysisData = [] }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [riskFilter, setRiskFilter] = useState("all");
   const [platformFilter, setPlatformFilter] = useState("all");
@@ -71,10 +71,10 @@ export default function AnalysisSection({ analysisData: propAnalysisData = [] })
     if (propAnalysisData.length === 0) {
       loadAnalyzedData();
       
-      // Set up polling every 10 seconds for new data (incremental)
+      // Set up polling every 30 seconds for new data (incremental)
       const pollInterval = setInterval(() => {
         loadAnalyzedData(false); // Incremental load
-      }, 10000);
+      }, 30000);
       
       return () => clearInterval(pollInterval);
     } else {
@@ -455,4 +455,6 @@ export default function AnalysisSection({ analysisData: propAnalysisData = [] })
       <AnalysisTable analysisData={paginatedData} />
     </section>
   );
-}
+});
+
+export default AnalysisSection;

@@ -1,7 +1,7 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { AlertTriangle, Eye, Clock, Flag, User, MapPin, Hash, ExternalLink, Info, X, Check, FileText, Upload, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, List, ListOrdered } from "lucide-react";
 
-export default function AnalysisTable({ analysisData = [] }) {
+const AnalysisTable = React.memo(function AnalysisTable({ analysisData = [] }) {
   const [sortField, setSortField] = useState("post.scraped_at");
   const [sortDirection, setSortDirection] = useState("desc");
   const [selectedItem, setSelectedItem] = useState(null);
@@ -210,8 +210,9 @@ export default function AnalysisTable({ analysisData = [] }) {
     return media.map(m => `${m.type || 'Unknown'}: ${m.url || 'No URL'}`).join(', ');
   };
 
-  const TruncatedCell = ({ children, fullText, className = "", item = null }) => {
+  const TruncatedCell = React.memo(({ children, fullText, className = "", item = null }) => {
     const [showTooltip, setShowTooltip] = useState(false);
+    const [timeoutId, setTimeoutId] = useState(null);
     
     // If there's no full text or it's empty, just return the children without tooltip
     if (!fullText || fullText.trim() === '') {
@@ -226,11 +227,27 @@ export default function AnalysisTable({ analysisData = [] }) {
       }
     };
     
+    const handleMouseEnter = () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      setShowTooltip(true);
+    };
+    
+    const handleMouseLeave = () => {
+      const id = setTimeout(() => setShowTooltip(false), 100);
+      setTimeoutId(id);
+    };
+    
+    useEffect(() => {
+      return () => {
+        if (timeoutId) clearTimeout(timeoutId);
+      };
+    }, [timeoutId]);
+    
     return (
       <div 
         className={`relative cursor-help ${className}`}
-        onMouseEnter={() => setShowTooltip(true)}
-        onMouseLeave={() => setShowTooltip(false)}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
         onClick={handleClick}
       >
         {children}
@@ -244,7 +261,12 @@ export default function AnalysisTable({ analysisData = [] }) {
         )}
       </div>
     );
-  };
+  }, (prevProps, nextProps) => {
+    return prevProps.children === nextProps.children && 
+           prevProps.fullText === nextProps.fullText && 
+           prevProps.className === nextProps.className &&
+           prevProps.item?.analysis_id === nextProps.item?.analysis_id;
+  });
 
   const DetailModal = ({ item, onClose }) => {
     if (!item) return null;
@@ -971,4 +993,6 @@ export default function AnalysisTable({ analysisData = [] }) {
       )}
     </div>
   );
-}
+});
+
+export default AnalysisTable;

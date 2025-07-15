@@ -1,0 +1,99 @@
+{
+  "analysis_id": "7ad602de-9f2f-425b-824e-21c4a7c4ca8d",
+  "source": {
+    "platform": "facebook",
+    "collection_method": "browser_use",
+    "scrape_session_id": "sess-2025-07-15T07:00Z"
+  },
+  "post": {
+    "id": "1267862971657526",
+    "permalink": "https://www.facebook.com/1267859034991253/posts/1267862971657526",
+    "scraped_at": "2025-07-15T07:07:28.594Z",
+    "published_at": "2025-07-15T06:07:33.646Z",
+    "full_text": "LF child for rent, preferred name: Hanz Christian AngeloJuvo",
+    "media": []
+  },
+  "actors": {
+    "poster": {
+      "name": "Hanz Christian Angelo",
+      "profile_id": "h4nz.dev",
+      "profile_url": "https://web.facebook.com/h4nz.dev"
+    },
+    "sharers": [
+      {
+        "name": "Allain Ralph Legaspi",
+        "profile_id": "Allain004",
+        "profile_url": "https://web.facebook.com/Allain004"
+      }
+    ],
+    "mentioned_people": [
+      "Hanz Christian Angelo"
+    ]
+  },
+  "language_detected": "en",
+  "location_detected": null,
+  "keywords_matched": [
+    "child",
+    "rent"
+  ],
+  "risk_scores": {
+    "grooming": 0.9,
+    "trafficking": 0.8,
+    "csam": 0.2,
+    "harassment": 0
+  },
+  "risk_level": "critical",
+  "flagged": true,
+  "flag_reason": [
+    "grooming_indicators",
+    "trafficking_indicators"
+  ],
+  "explanation": "The post explicitly states \"LF child for rent\", which is a highly concerning phrase indicative of potential child grooming and human trafficking.  The phrase implies intent to exploit a child, raising immediate and serious concerns.",
+  "model_outputs": {
+    "gemini": {
+      "language_detected": "en",
+      "mentioned_people": [
+        "Hanz Christian Angelo"
+      ],
+      "location_detected": null,
+      "keywords_matched": [
+        "child",
+        "rent"
+      ],
+      "risk_scores": {
+        "grooming": 0.9,
+        "trafficking": 0.8,
+        "csam": 0.2,
+        "harassment": 0
+      },
+      "risk_level": "critical",
+      "flagged": true,
+      "flag_reason": [
+        "grooming_indicators",
+        "trafficking_indicators"
+      ],
+      "explanation": "The post explicitly states \"LF child for rent\", which is a highly concerning phrase indicative of potential child grooming and human trafficking.  The phrase implies intent to exploit a child, raising immediate and serious concerns.",
+      "recommended_action": "alert_immediate",
+      "priority_score": 95,
+      "compliance": {
+        "ra11930": true,
+        "data_privacy_exemption": false
+      }
+    },
+    "photodna": {
+      "match": false
+    }
+  },
+  "matched_hashes": [],
+  "recommended_action": "alert_immediate",
+  "priority_score": 95,
+  "compliance": {
+    "ra11930": true,
+    "data_privacy_exemption": false
+  },
+  "ai_version": {
+    "gemini_model": "gemini-2.0-flash-exp"
+  },
+  "processing_ms": 3065,
+  "signature": "1913fa7f"
+}

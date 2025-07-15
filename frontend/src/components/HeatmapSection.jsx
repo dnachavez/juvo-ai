@@ -2,7 +2,7 @@ import React from "react";
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
-export default function HeatmapSection({ riskPoints, riskColor, loading, error, locationStats }) {
+const HeatmapSection = React.memo(function HeatmapSection({ riskPoints, riskColor, loading, error, locationStats }) {
   return (
     <section
       id="heatmap"
@@ -163,4 +163,6 @@ export default function HeatmapSection({ riskPoints, riskColor, loading, error, 
       </div>
     </section>
   );
-}
+});
+
+export default HeatmapSection;

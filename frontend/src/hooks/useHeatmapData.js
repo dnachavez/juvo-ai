@@ -10,6 +10,7 @@ export const useHeatmapData = () => {
   const [heatmapPoints, setHeatmapPoints] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [lastDataHash, setLastDataHash] = useState(null);
   const [locationStats, setLocationStats] = useState({
     total: 0,
     geocoded: 0,
@@ -95,15 +96,26 @@ export const useHeatmapData = () => {
       // Ensure we have an array, but don't fail if empty or invalid
       const dataArray = Array.isArray(analyzedData) ? analyzedData : [];
       
+      // Create a simple hash of the data to detect changes
+      const dataHash = JSON.stringify(dataArray.map(item => item.analysis_id).sort());
+      
+      // Skip processing if data hasn't changed
+      if (dataHash === lastDataHash) {
+        console.log('Heatmap data unchanged, skipping update');
+        return;
+      }
+      
       if (dataArray.length === 0) {
         console.warn('No analyzed data found, showing empty map');
         setHeatmapPoints([]);
         setLocationStats({ total: 0, geocoded: 0, failed: 0 });
+        setLastDataHash(dataHash);
         return;
       }
 
       const points = await processAnalyzedData(dataArray);
       setHeatmapPoints(points);
+      setLastDataHash(dataHash);
 
     } catch (err) {
       console.error('Error fetching heatmap data:', err);
@@ -113,11 +125,18 @@ export const useHeatmapData = () => {
     } finally {
       setLoading(false);
     }
-  }, [processAnalyzedData]);
+  }, [processAnalyzedData, lastDataHash]);
 
-  // Initial data fetch
+  // Initial data fetch and polling setup
   useEffect(() => {
     fetchData();
+    
+    // Set up polling every 30 seconds for new data (same as AnalysisSection)
+    const pollInterval = setInterval(() => {
+      fetchData();
+    }, 30000);
+    
+    return () => clearInterval(pollInterval);
   }, [fetchData]);
 
   /**

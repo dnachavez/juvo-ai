@@ -1,3 +1,4 @@
+import React from 'react';
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from 'react-leaflet';
 import { RefreshCw, AlertTriangle, MapPin } from 'lucide-react';
 import { useHeatmapData } from '../hooks/useHeatmapData';
@@ -17,7 +18,7 @@ const riskRadius = {
   low: 8,
 };
 
-export default function HeatmapMap() {
+const HeatmapMap = React.memo(function HeatmapMap() {
   const { heatmapPoints, loading, error, locationStats, refreshData } = useHeatmapData();
 
   // Calculate center based on points or default to Philippines
@@ -139,4 +140,6 @@ export default function HeatmapMap() {
       </div>
     </div>
   );
-}
+});
+
+export default HeatmapMap;
