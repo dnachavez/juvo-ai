@@ -1,3 +1,7 @@
 node_modules/
 .env
 gen-lang-client-*.json
+post_*.json
+analysis_*.json
+tool/monitoring/mention/scraped_media/*.png
+tool/monitoring/mention/processed_records.json

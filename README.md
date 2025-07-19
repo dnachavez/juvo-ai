@@ -1,6 +1,10 @@
-# Juvo AI - Social Media Monitoring & Risk Analysis Platform
+<center>
+  <h1>Juvo AI - Social Media Monitoring & Risk Analysis Platform</h1>
 
-A comprehensive platform for monitoring social media content, analyzing risks, and tracking safety concerns using AI-powered analysis.
+  <img src="frontend/public/icon_text.png" width="250">
+</center>
+
+A platform for monitoring social media content, analyzing risks, and tracking safety concerns using AI-powered analysis.
 
 ## 📁 Project Structure
 
@@ -9,16 +13,27 @@ juvo-ai/
 ├── frontend/                    # React dashboard application
 │   ├── src/
 │   │   ├── components/         # React components
-│   │   ├── utils/             # API utilities
+│   │   ├── pages/             # Page components for routing
+│   │   ├── hooks/             # Custom React hooks
+│   │   ├── utils/             # API utilities and helpers
 │   │   ├── data/              # Static data files
-│   │   └── ...
+│   │   └── assets/            # Images and static assets
 │   ├── api-server.js          # Express API server
+│   ├── dist/                  # Build output directory
 │   └── package.json
 ├── analyzed_data/             # JSON files with analysis results
-├── scraped_posts/            # Raw scraped social media posts
+├── reports/                   # Case report management system
+│   ├── case-reports/         # Uploaded report files
+│   └── metadata/             # System metadata and configuration
 ├── tool/                     # Analysis and monitoring tools
 │   ├── analysis/             # Content analysis tools
 │   └── monitoring/           # Social media monitoring tools
+│       ├── mention/          # Facebook mention monitoring
+│       │   ├── scraped_posts/  # Raw scraped posts
+│       │   └── scraped_media/  # Downloaded media files
+│       └── search/           # Keyword-based search monitoring
+├── api-server.js             # Root-level API server
+├── package.json              # Root package configuration
 └── README.md                 # This file
 ```
 
@@ -29,6 +44,7 @@ juvo-ai/
 - Node.js (v14 or higher)
 - npm or yarn
 - Git
+- Modern web browser (Chrome, Firefox, Safari, Edge)
 
 ### 1. Clone and Setup
 
@@ -111,15 +127,34 @@ node index.js
 - **Real-time Data Loading**: Automatically fetches data from `analyzed_data` folder
 - **Advanced Filtering**: Filter by risk level, platform, and search terms
 - **Detailed View**: Click any row to see complete analysis details
-- **Status Management**: Track investigation, intervention, and resolution stages
-- **Report Generation**: Add reports and notes for each case
-- **Export Functionality**: Export filtered data to CSV
+- **Case Status Management**: Track cases through new → investigation → intervention → resolution stages
+- **Report Generation**: Required reports for all status changes with optional file uploads
+- **Report Viewing**: View all reports and status changes for each case
+- **Export Functionality**: Export filtered data to CSV including case status information
+
+### Case Management System
+- **Status Tracking**: Four-stage workflow (New, Investigation, Intervention, Resolution)
+- **Mandatory Reporting**: Text reports required for all status changes
+- **File Uploads**: Support for PDF, DOC, DOCX, and TXT files
+- **Report History**: Complete audit trail of all case activities
+- **Status Dashboard**: Visual indicators for case status in the main table
 
 ### Geographic Risk Analysis
-- **Interactive Map**: Shows risk locations across monitored areas
-- **Risk Summary**: High-level statistics and counts
-- **Scrollable Risk List**: Detailed list of all risk locations
+- **Interactive Heatmap**: Shows risk locations across monitored areas with color-coded intensity
+- **Risk Summary Dashboard**: High-level statistics and counts with filtering capabilities
+- **Scrollable Risk List**: Detailed list of all risk locations with coordinates
 - **Real-time Updates**: Updates as new data becomes available
+
+### Categories Analysis
+- **Risk Category Breakdown**: Detailed analysis of grooming, trafficking, CSAM, and harassment risks
+- **Trend Visualization**: Line graphs showing risk patterns over time
+- **Category Statistics**: Individual cards showing category-specific metrics
+- **Filterable Data**: Category-specific filtering and analysis
+
+### Keywords Monitoring
+- **Keyword Log Management**: Track and manage keyword-based monitoring
+- **Search Performance**: Monitor effectiveness of different keyword combinations
+- **Log Entry Management**: Add, edit, and delete keyword monitoring entries
 
 ## 🔧 API Endpoints
 
@@ -137,10 +172,11 @@ node index.js
 
 ## 📁 Data Flow
 
-1. **Monitoring Tools** scrape social media posts → `scraped_posts/`
+1. **Monitoring Tools** scrape social media posts → `tool/monitoring/mention/scraped_posts/` and `scraped_media/`
 2. **Analysis Tools** process posts → `analyzed_data/`
 3. **API Server** serves data from `analyzed_data/`
 4. **Dashboard** displays real-time analysis results
+5. **Case Management** tracks status changes and reports → `reports/case-reports/` (localStorage for demo)
 
 ## 🛠 Tools Overview
 
@@ -277,6 +313,15 @@ curl -X POST http://localhost:3001/api/notify \
 - Check individual tool README files for specific configurations
 - Review component code for customization options
 - API documentation available at `/api/health` endpoint
+
+## 👥 Collaborators
+
+This project is developed and maintained by:
+
+- AI/ML: [dnachavez](https:///github.com/dnachavez)
+- Frontend: [Allain-afk](https://github.com/Allain-afk)
+- Frontend: [h4nzdev](https://github.com/h4nzdev)
+- Presenter/Picther: [Prannsss](https://github.com/Prannsss)
 
 ---
 
